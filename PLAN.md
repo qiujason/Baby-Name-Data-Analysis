@@ -21,17 +21,19 @@ value. I can parse through the files and add new Person objects or add the count
 for each name. Therefore, for these questions, I can easily sort and filter through names and genders and get the 
 corresponding count for each year of the name.
 ### What are some ways you could test your code to make sure it is giving the correct answer (think beyond just choosing "lucky" parameter values)?
-I would create a JUnit test that can easily test different years, names, and genders. 
+I would create a JUnit test that can easily test different years, names, and genders. For instance, I would check to see
+if the right year, name, and gender is outputted for each respective test case.
 ### What kinds of things make the second question harder to test?
 It is harder to test because we would have to go through more common letters by hand and check it with our output. It 
 would be really difficult having to count them by hand.
 ### What kind of errors might you expect to encounter based on the questions or in the dataset?
 I would expect errors such as sorting incorrectly, getting the wrong name, parsing errors, or getting the wrong count of babies.
 ### How would you detect those errors and what would a reasonable "answer" be in such cases?
-I would detect these errors if they are blatantly wrong or off. I would see if the answer is reasonable and makes 
-logical sense in the context it was given in. A reasonable answer in these cases would be appropriate numbers and names
-that make sense in the time periods. 
+In these lines, I would create JUnit tests to test if the answers are reasonable. For instance, I would create tests
+that would check to see if the number of babies of a certain name is the right count or if the right name is outputted
+for the appropriate year/ranking. Reasonable answers would be a number of babies that isn't ridiculously high and a name
+that would make sense for its popularity.
 ### How would your algorithm and testing need to change (if at all) to handle multiple files (i.e., a range of years)?
 The algorithm would have to be able to incorporate names and counts changing among multiple years. 
-I would create JUnit tests for checking names and counts of multiple years so that I can see if 
+I would create JUnit tests for checking names and counts of a range of years so that I can see if 
 the algorithm can handle the changes among multiple years. 
