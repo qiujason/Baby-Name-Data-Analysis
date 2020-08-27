@@ -1,6 +1,10 @@
 package names;
 
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 /**
  * Feel free to completely change this code or delete it entirely. 
  */
@@ -8,7 +12,37 @@ public class Main {
     /**
      * Start of the program.
      */
-    public static void main (String[] args) {
-        System.out.println("Hello world");
+    public static void main (String[] args) throws FileNotFoundException {
+        Scanner scan = new Scanner(System.in);
+        System.out.println("1."); // question 1
+        System.out.print("Year: ");
+        String year = scan.next();
+        Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
+        boolean firstFemale = false;
+        while(scanner.hasNextLine()) {
+            String[] nameArray = scanner.nextLine().split(",");
+            if (!firstFemale && nameArray[1].equals("F")) {
+                firstFemale = true;
+                System.out.println(nameArray[0]);
+            }
+            else if (nameArray[1].equals("M")) {
+                System.out.println(nameArray[0]);
+                break;
+            }
+        }
+//
+//        System.out.println("2."); // question 2
+//        Scanner sc = new Scanner(new File("data/yob1900.txt"));
+//        while(sc.hasNextLine()) {
+//            String[] nameArray = scanner.nextLine().split(",");
+//            if (!firstFemale && nameArray[1].equals("F")) {
+//                firstFemale = true;
+//                System.out.println(nameArray[0]);
+//            }
+//            else if (nameArray[1].equals("M")) {
+//                System.out.println(nameArray[0]);
+//                break;
+//            }
+//        }
     }
 }
