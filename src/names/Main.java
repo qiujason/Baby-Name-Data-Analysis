@@ -12,43 +12,51 @@ public class Main {
     /**
      * Start of the program.
      */
-    public static void main (String[] args) throws FileNotFoundException {
-        Scanner scan = new Scanner(System.in);
-        System.out.println("1."); // question 1
-        System.out.print("Year: ");
-        String year = scan.next();
+    // test implementation #1
+    private static final int YEAR1 = 1900;
+
+    // test implementation #2
+    private static final int YEAR2 = 1900;
+    private static final String GENDER = "F";
+    private static final String LETTER = "Q";
+    
+    private static String[] getTopRankedYear(int year) throws FileNotFoundException {
+        String[] topRanked = new String[2];
         Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
         boolean firstFemale = false;
         while(scanner.hasNextLine()) {
             String[] nameArray = scanner.nextLine().split(",");
             if (!firstFemale && nameArray[1].equals("F")) {
                 firstFemale = true;
-                System.out.println(nameArray[0]);
+                topRanked[0] = nameArray[0];
             }
             else if (nameArray[1].equals("M")) {
-                System.out.println(nameArray[0]);
+                topRanked[1] = nameArray[0];
                 break;
             }
         }
+        return topRanked;
+    }
 
-        System.out.println("2."); // question 2
-        System.out.print("Year: ");
-        year = scan.next();
-        System.out.print("Gender (M/F): ");
-        String gender = scan.next();
-        System.out.print("First Letter: ");
-        String letter = scan.next();
-        Scanner sc = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
-        int count = 0;
-        int totalBabies = 0;
-        while(sc.hasNextLine()) {
-            String[] nameArray = sc.nextLine().split(",");
+    private static int[] getCountByGenderLetterYear(int year, String gender, String letter) throws FileNotFoundException {
+        int[] counts = new int[2];
+        Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
+        while(scanner.hasNextLine()) {
+            String[] nameArray = scanner.nextLine().split(",");
             if (nameArray[1].equals(gender) && nameArray[0].substring(0,1).equals(letter)) {
-                count++;
-                totalBabies += Integer.valueOf(nameArray[2]);
+                counts[0]++;
+                counts[1] += Integer.valueOf(nameArray[2]);
             }
         }
-        System.out.println(count);
-        System.out.println(totalBabies);
+        return counts;
+    }
+    public static void main (String[] args) throws FileNotFoundException {
+        System.out.println("Test Implementation #1");
+        for (String s : getTopRankedYear(YEAR1)) System.out.println(s);
+
+        System.out.println("\nTest Implementation #2");
+        int[] counts = getCountByGenderLetterYear(YEAR2, GENDER, LETTER);
+        System.out.println(counts[0] + " different names");
+        System.out.println(counts[1] + " total babies");
     }
 }
