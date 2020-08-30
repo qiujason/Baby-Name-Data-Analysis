@@ -15,27 +15,31 @@ public class Main {
      * Start of the program.
      */
     // first and last years of the dataset
-    private static final int FIRSTYEAR = 1880;
-    private static final int LASTYEAR = 2018;
+    private final int FIRSTYEAR = 1880;
+    private final int LASTYEAR = 2018;
 
     // test implementation #1
-    private static final int YEAR1 = 1900;
+    private final int YEAR1 = 1900;
 
     // test implementation #2
-    private static final int YEAR2 = 1900;
-    private static final String GENDER1 = "F";
-    private static final String LETTER = "Q";
+    private final int YEAR2 = 1900;
+    private final String GENDER1 = "F";
+    private final String LETTER = "Q";
 
     // basic implementation #1
-    private static final String NAME1 = "John";
-    private static final String GENDER2 = "M";
+    private final String NAME1 = "John";
+    private final String GENDER2 = "M";
 
     // basic implementation #2
-    private static final int YEAR3 = 2000;
-    private static final String NAME2 = "Jason";
-    private static final String GENDER3 = "M";
+    private final int YEAR3 = 2000;
+    private final String NAME2 = "Jason";
+    private final String GENDER3 = "M";
+
+    // basic implementation #3
+    private final int START_YEAR = 2000;
+    private final int FINAL_YEAR = 2009;
     
-    public static String[] getTopRankedYear(int year) throws FileNotFoundException {
+    public String[] getTopRankedYear(int year) throws FileNotFoundException {
         String[] topRanked = new String[2];
         Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
         boolean firstFemale = false;
@@ -53,7 +57,7 @@ public class Main {
         return topRanked;
     }
 
-    public static int[] getCountByGenderLetterYear(int year, String gender, String letter) throws FileNotFoundException {
+    public int[] getCountByGenderLetterYear(int year, String gender, String letter) throws FileNotFoundException {
         int[] counts = new int[2];
         Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
         while (scanner.hasNextLine()) {
@@ -66,7 +70,7 @@ public class Main {
         return counts;
     }
 
-    public static Map<Integer,Integer> getRankingsNameGender(String name, String gender) throws FileNotFoundException {
+    public Map<Integer,Integer> getRankingsNameGender(String name, String gender) throws FileNotFoundException {
         Map<Integer, Integer> rankings = new HashMap<>();
         for (int year = FIRSTYEAR; year <= LASTYEAR; year++) {
             Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
@@ -85,7 +89,7 @@ public class Main {
         return rankings;
     }
 
-    public static String getSameRank(String name, String gender, int year) throws FileNotFoundException {
+    public String getSameRank(String name, String gender, int year) throws FileNotFoundException {
         int rank = 0;
         Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
         boolean found = false;
@@ -114,22 +118,24 @@ public class Main {
     }
 
     public static void main (String[] args) throws FileNotFoundException {
+        Main main = new Main();
+
         System.out.println("Test Implementation #1");
-        System.out.println(YEAR1);
-        for (String s : getTopRankedYear(YEAR1)) System.out.println(s);
+        System.out.println(main.YEAR1);
+        for (String s : main.getTopRankedYear(main.YEAR1)) System.out.println(s);
 
         System.out.println("\nTest Implementation #2");
-        System.out.println(YEAR2 + " - " + LETTER + " (" + GENDER1 + ")");
-        int[] counts = getCountByGenderLetterYear(YEAR2, GENDER1, LETTER);
+        System.out.println(main.YEAR2 + " - " + main.LETTER + " (" + main.GENDER1 + ")");
+        int[] counts = main.getCountByGenderLetterYear(main.YEAR2, main.GENDER1, main.LETTER);
         System.out.println(counts[0] + " different names");
         System.out.println(counts[1] + " total babies");
 
         System.out.println("\nBasic Implementation #1");
-        System.out.println(NAME1 + " (" + GENDER2 + ")");
-        Map<Integer, Integer> rankings = getRankingsNameGender(NAME1, GENDER2);
+        System.out.println(main.NAME1 + " (" + main.GENDER2 + ")");
+        Map<Integer, Integer> rankings = main.getRankingsNameGender(main.NAME1, main.GENDER2);
         for (int year : rankings.keySet()) System.out.println(year + " - " + rankings.get(year));
 
         System.out.println("\nBasic Implementation #2");
-        System.out.println(getSameRank(NAME2, GENDER3, YEAR3));
+        System.out.println(main.getSameRank(main.NAME2, main.GENDER3, main.YEAR3));
     }
 }
