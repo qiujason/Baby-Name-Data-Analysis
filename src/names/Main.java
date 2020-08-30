@@ -14,6 +14,7 @@ public class Main {
     /**
      * Start of the program.
      */
+    // first and last years of the dataset
     private static final int FIRSTYEAR = 1880;
     private static final int LASTYEAR = 2018;
 
@@ -28,6 +29,11 @@ public class Main {
     // basic implementation #1
     private static final String NAME1 = "John";
     private static final String GENDER2 = "M";
+
+    // basic implementation #2
+    private static final int YEAR3 = 2000;
+    private static final String NAME2 = "Jason";
+    private static final String GENDER3 = "M";
     
     public static String[] getTopRankedYear(int year) throws FileNotFoundException {
         String[] topRanked = new String[2];
@@ -79,6 +85,34 @@ public class Main {
         return rankings;
     }
 
+    public static String getSameRank(String name, String gender, int year) throws FileNotFoundException {
+        int rank = 0;
+        Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
+        boolean found = false;
+        while (scanner.hasNextLine()) {
+            String[] nameArray = scanner.nextLine().split(",");
+            if (nameArray[1].equals(gender)) {
+                rank++;
+                if (nameArray[0].equals(name)) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (found) {
+            scanner = new Scanner(new File("data/ssa_complete/yob2018.txt")); // most recent year
+            int num = 0;
+            while (scanner.hasNextLine() && num < rank) {
+                String[] nameArray = scanner.nextLine().split(",");
+                if (nameArray[1].equals(gender)) {
+                    num++;
+                    if (num == rank) return nameArray[0];
+                }
+            }
+        }
+        return "Name not found";
+    }
+
     public static void main (String[] args) throws FileNotFoundException {
         System.out.println("Test Implementation #1");
         System.out.println(YEAR1);
@@ -94,5 +128,8 @@ public class Main {
         System.out.println(NAME1 + " (" + GENDER2 + ")");
         Map<Integer, Integer> rankings = getRankingsNameGender(NAME1, GENDER2);
         for (int year : rankings.keySet()) System.out.println(year + " - " + rankings.get(year));
+
+        System.out.println("\nBasic Implementation #2");
+        System.out.println(getSameRank(NAME2, GENDER3, YEAR3));
     }
 }
