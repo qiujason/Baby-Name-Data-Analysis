@@ -151,15 +151,12 @@ public class Main {
     }
 
     public List<String> getMostPopularInRange(String gender, int startyear, int finalyear) throws FileNotFoundException {
-//        Map<String, Integer> ranking = new HashMap<>();
         Map<String, Integer> years = new HashMap<>();
         for (int year = startyear; year <= finalyear; year++) {
-            Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
+            Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
             while (scanner.hasNextLine()) {
                 String[] nameArray = scanner.nextLine().split(",");
                 if (nameArray[1].equals(gender)) {
-//                    ranking.putIfAbsent(nameArray[0], 0);
-//                    ranking.put(nameArray[0], ranking.get(nameArray[0]) + Integer.parseInt(nameArray[2]));
                     years.putIfAbsent(nameArray[0], 0);
                     years.put(nameArray[0], years.get(nameArray[0]) + 1);
                     break;
@@ -187,7 +184,7 @@ public class Main {
         Map<String, Integer> popular = new HashMap<>();
         Map<String, SortedSet<String>> listNames = new HashMap<>();
         for (int year = startyear; year <= finalyear; year++) {
-            Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
+            Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
             while (scanner.hasNextLine()) {
                 String[] nameArray = scanner.nextLine().split(",");
                 if (nameArray[1].equals("F")) {
