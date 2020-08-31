@@ -150,32 +150,35 @@ public class Main {
         return "Name not found";
     }
 
-    public String[] getMostPopularInRange(String gender, int startyear, int finalyear) throws FileNotFoundException {
-        Map<String, Integer> ranking = new HashMap<>();
+    public List<String> getMostPopularInRange(String gender, int startyear, int finalyear) throws FileNotFoundException {
+//        Map<String, Integer> ranking = new HashMap<>();
         Map<String, Integer> years = new HashMap<>();
         for (int year = startyear; year <= finalyear; year++) {
             Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
-            int rank = 0;
-            while (scanner.hasNextLine() && rank < TOPRANKS) {
+            while (scanner.hasNextLine()) {
                 String[] nameArray = scanner.nextLine().split(",");
                 if (nameArray[1].equals(gender)) {
-                    ranking.putIfAbsent(nameArray[0], 0);
-                    ranking.put(nameArray[0], ranking.get(nameArray[0]) + Integer.parseInt(nameArray[2]));
+//                    ranking.putIfAbsent(nameArray[0], 0);
+//                    ranking.put(nameArray[0], ranking.get(nameArray[0]) + Integer.parseInt(nameArray[2]));
                     years.putIfAbsent(nameArray[0], 0);
                     years.put(nameArray[0], years.get(nameArray[0]) + 1);
-                    rank++;
+                    break;
                 }
             }
         }
-        SortedSet<String> keys = new TreeSet<>((a,b)-> ranking.get(b)-ranking.get(a));
+        SortedSet<String> keys = new TreeSet<>((a,b)-> years.get(b)-years.get(a));
         keys.addAll(years.keySet());
-        String[] results = new String[keys.size()];
-        int i = 1;
+        int max = 0;
+        if (keys.size() > 0) {
+            max = years.get(keys.first());
+        }
+        List<String> results = new ArrayList<>();
         for (String key : keys) {
-            String result = i + ". " + key + " for " + years.get(key) + " years";
-            System.out.println(i + ". " + key + " for " + years.get(key) + " years");
-            results[i-1] = result;
-            i++;
+            if (years.get(key) == max) {
+                String result = key + " for " + years.get(key) + " years";
+                System.out.println(result);
+                results.add(result);
+            }
         }
         return results;
     }
@@ -239,7 +242,7 @@ public class Main {
 
         System.out.println("\nBasic Implementation #3");
         System.out.println(main.START_YEAR1 + " - " + main.FINAL_YEAR1);
-        String[] result1 = main.getMostPopularInRange(main.GENDER4, main.START_YEAR1, main.FINAL_YEAR1);
+        List<String> result1 = main.getMostPopularInRange(main.GENDER4, main.START_YEAR1, main.FINAL_YEAR1);
 
         System.out.println("\nBasic Implementation #4");
         System.out.println(main.START_YEAR2 + " - " + main.FINAL_YEAR2);
