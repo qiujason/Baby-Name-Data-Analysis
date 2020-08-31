@@ -132,24 +132,21 @@ public class Main {
     public void getMostPopularInRange(String gender, int startyear, int finalyear) throws FileNotFoundException {
         Map<String, Integer> ranking = new HashMap<>();
         Map<String, Integer> years = new HashMap<>();
-        for (int year = startyear; year < finalyear; year++) {
+        for (int year = startyear; year <= finalyear; year++) {
             Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
             int rank = 0;
             while (scanner.hasNextLine() && rank < TOPRANKS) {
                 String[] nameArray = scanner.nextLine().split(",");
                 if (nameArray[1].equals(gender)) {
                     ranking.putIfAbsent(nameArray[0], 0);
-                    ranking.put(nameArray[0], ranking.get(nameArray[0]) + rank);
+                    ranking.put(nameArray[0], ranking.get(nameArray[0]) + Integer.parseInt(nameArray[2]));
                     years.putIfAbsent(nameArray[0], 0);
                     years.put(nameArray[0], years.get(nameArray[0]) + 1);
                     rank++;
                 }
             }
         }
-        SortedSet<String> keys = new TreeSet<>((a,b)->{
-            int val = years.get(b) - years.get(a);
-            return val != 0 ? val : ranking.get(a)-ranking.get(b);
-        });
+        SortedSet<String> keys = new TreeSet<>((a,b)-> ranking.get(b)-ranking.get(a));
         keys.addAll(years.keySet());
         int i = 1;
         for (String key : keys) {
@@ -159,20 +156,33 @@ public class Main {
     }
 
     public void mostPopularLetterGirls(int startyear, int finalyear) throws FileNotFoundException {
-        for (int year = startyear; year < finalyear; year++) {
+        Map<String, Integer> popular = new HashMap<>();
+        Map<String, SortedSet<String>> listNames = new HashMap<>();
+        for (int year = startyear; year <= finalyear; year++) {
             Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
-//            int rank = 0;
-//            while (scanner.hasNextLine()) {
-//                String[] nameArray = scanner.nextLine().split(",");
-//                if (nameArray[1].equals(gender)) {
-//                    ranking.putIfAbsent(nameArray[0], 0);
-//                    ranking.put(nameArray[0], ranking.get(nameArray[0]) + rank);
-//                    years.putIfAbsent(nameArray[0], 0);
-//                    years.put(nameArray[0], years.get(nameArray[0]) + 1);
-//                    rank++;
-//                }
-//            }
+            while (scanner.hasNextLine()) {
+                String[] nameArray = scanner.nextLine().split(",");
+                if (nameArray[1].equals("F")) {
+                    String letter = nameArray[0].substring(0, 1);
+                    popular.putIfAbsent(letter, 0);
+                    popular.put(letter, popular.get(letter) + Integer.parseInt(nameArray[2]));
+                    listNames.putIfAbsent(letter, new TreeSet<>());
+                    listNames.get(letter).add(nameArray[0]);
+                }
+            }
         }
+        String mostPopularLetter = "";
+        int max = 0;
+        for (char i = 'Z'; i >= 'A'; i--) {
+            String letter = Character.toString(i);
+            int count = popular.get(letter);
+            if (count >= max) {
+                mostPopularLetter = letter;
+                max = count;
+            }
+        }
+        System.out.println("Most Popular Letter for Females: " + mostPopularLetter);
+        for (String name : listNames.get(mostPopularLetter)) System.out.println(name);
     }
 
     public static void main (String[] args) throws FileNotFoundException {
@@ -194,9 +204,11 @@ public class Main {
         String name = main.getSameRank(main.NAME2, main.GENDER3, main.YEAR3);
 
         System.out.println("\nBasic Implementation #3");
+        System.out.println(main.START_YEAR1 + " - " + main.FINAL_YEAR1);
         main.getMostPopularInRange(main.GENDER4, main.START_YEAR1, main.FINAL_YEAR1);
 
         System.out.println("\nBasic Implementation #4");
+        System.out.println(main.START_YEAR2 + " - " + main.FINAL_YEAR2);
         main.mostPopularLetterGirls(main.START_YEAR2, main.FINAL_YEAR2);
     }
 }
