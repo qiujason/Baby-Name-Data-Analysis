@@ -19,31 +19,31 @@ public class Main {
 
     // change arguments for each method
     // test implementation #1
-    private final int YEAR1 = 1900;
+    private final int YEAR1 = 2016;
 
     // test implementation #2
-    private final int YEAR2 = 1900;
-    private final String GENDER1 = "F"; // M or F
-    private final String LETTER = "Q"; // First letter of names
+    private final int YEAR2 = 1933;
+    private final String GENDER1 = "M"; // M or F
+    private final String LETTER = "F"; // First letter of names
 
     // basic implementation #1
-    private final String NAME1 = "John";
+    private final String NAME1 = "Eddie";
     private final String GENDER2 = "M"; // M or F
 
     // basic implementation #2
-    private final int YEAR3 = 2000;
+    private final int YEAR3 = 1900;
     private final String NAME2 = "Jason";
     private final String GENDER3 = "M"; // M or F
 
     // basic implementation #3
     private final int TOPRANKS = 10;
-    private final int START_YEAR1 = 2000;
-    private final int FINAL_YEAR1 = 2009;
+    private final int START_YEAR1 = 1990;
+    private final int FINAL_YEAR1 = 2000;
     private final String GENDER4 = "M"; // M or F
 
     // basic implementation #4
-    private final int START_YEAR2 = 2000;
-    private final int FINAL_YEAR2 = 2009;
+    private final int START_YEAR2 = 1885;
+    private final int FINAL_YEAR2 = 2005;
     
     public String[] getTopRankedYear(int year) throws FileNotFoundException {
         String[] topRanked = new String[2];
@@ -60,7 +60,9 @@ public class Main {
                 break;
             }
         }
-        for (String s : topRanked) System.out.println(s);
+        for (String s : topRanked) {
+            System.out.println(s);
+        }
         return topRanked;
     }
 
@@ -81,21 +83,38 @@ public class Main {
 
     public Map<Integer,Integer> getRankingsNameGender(String name, String gender) throws FileNotFoundException {
         Map<Integer, Integer> rankings = new HashMap<>();
-        for (int year = 1880; year <= 2018; year++) {
-            Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
-            boolean found = false;
-            while (scanner.hasNextLine()) {
-                String[] nameArray = scanner.nextLine().split(",");
-                if (nameArray[1].equals(gender) && nameArray[0].equals(name)) {
-                    rankings.put(year, Integer.parseInt(nameArray[2]));
-                    found = true;
-                    break;
+        String filepath = "data/" + DIRECTORY;
+        File dir = new File(filepath);
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            for (File file : directoryListing) {
+                // get year from text file name by only extracting the numbers
+                String yearString = file.getName().replaceAll("[^0-9]","");
+                // convert yearString to int
+                int year = Integer.parseInt(yearString);
+                Scanner scanner = new Scanner(file);
+                boolean found = false;
+                int rank = 1;
+                while (scanner.hasNextLine()) {
+                    String[] nameArray = scanner.nextLine().split(",");
+                    if (nameArray[1].equals(gender)) {
+                        if (nameArray[0].equals(name)) {
+                            rankings.put(year, rank);
+                            found = true;
+                            break;
+                        }
+                        rank++;
+                    }
+                }
+                // name not found
+                if (!found) {
+                    rankings.put(year, -1);
                 }
             }
-            // name not found
-            if (!found) rankings.put(year, -1);
         }
-        for (int year : rankings.keySet()) System.out.println(year + " - " + rankings.get(year));
+        for (int year : rankings.keySet()) {
+            System.out.println(year + " - " + rankings.get(year));
+        }
         return rankings;
     }
 
