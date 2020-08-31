@@ -12,40 +12,42 @@ public class Main {
     /**
      * Start of the program.
      */
-    // first and last years of the dataset
-    private final int FIRSTYEAR = 1880;
-    private final int LASTYEAR = 2018;
+    // CONFIGURATION
+    // for all methods
+    private static final int RECENTYEAR = 2018;
+    private static final String DIRECTORY = "ssa_complete";
 
+    // change arguments for each method
     // test implementation #1
     private final int YEAR1 = 1900;
 
     // test implementation #2
     private final int YEAR2 = 1900;
-    private final String GENDER1 = "F";
-    private final String LETTER = "Q";
+    private final String GENDER1 = "F"; // M or F
+    private final String LETTER = "Q"; // First letter of names
 
     // basic implementation #1
     private final String NAME1 = "John";
-    private final String GENDER2 = "M";
+    private final String GENDER2 = "M"; // M or F
 
     // basic implementation #2
     private final int YEAR3 = 2000;
     private final String NAME2 = "Jason";
-    private final String GENDER3 = "M";
+    private final String GENDER3 = "M"; // M or F
 
     // basic implementation #3
     private final int TOPRANKS = 10;
     private final int START_YEAR1 = 2000;
     private final int FINAL_YEAR1 = 2009;
-    private final String GENDER4 = "M";
+    private final String GENDER4 = "M"; // M or F
 
-    // basic implmentation #4
+    // basic implementation #4
     private final int START_YEAR2 = 2000;
     private final int FINAL_YEAR2 = 2009;
     
     public String[] getTopRankedYear(int year) throws FileNotFoundException {
         String[] topRanked = new String[2];
-        Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
+        Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
         boolean firstFemale = false;
         while (scanner.hasNextLine()) {
             String[] nameArray = scanner.nextLine().split(",");
@@ -64,7 +66,7 @@ public class Main {
 
     public int[] getCountByGenderLetterYear(int year, String gender, String letter) throws FileNotFoundException {
         int[] counts = new int[2];
-        Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
+        Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
         while (scanner.hasNextLine()) {
             String[] nameArray = scanner.nextLine().split(",");
             if (nameArray[1].equals(gender) && nameArray[0].substring(0,1).equals(letter)) {
@@ -79,8 +81,8 @@ public class Main {
 
     public Map<Integer,Integer> getRankingsNameGender(String name, String gender) throws FileNotFoundException {
         Map<Integer, Integer> rankings = new HashMap<>();
-        for (int year = FIRSTYEAR; year <= LASTYEAR; year++) {
-            Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
+        for (int year = 1880; year <= 2018; year++) {
+            Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
             boolean found = false;
             while (scanner.hasNextLine()) {
                 String[] nameArray = scanner.nextLine().split(",");
@@ -99,7 +101,7 @@ public class Main {
 
     public String getSameRank(String name, String gender, int year) throws FileNotFoundException {
         int rank = 0;
-        Scanner scanner = new Scanner(new File("data/ssa_complete/yob" + year + ".txt"));
+        Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
         boolean found = false;
         while (scanner.hasNextLine()) {
             String[] nameArray = scanner.nextLine().split(",");
@@ -112,7 +114,7 @@ public class Main {
             }
         }
         if (found) {
-            scanner = new Scanner(new File("data/ssa_complete/yob2018.txt")); // most recent year
+            scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + RECENTYEAR + ".txt")); // most recent year
             int num = 0;
             while (scanner.hasNextLine() && num < rank) {
                 String[] nameArray = scanner.nextLine().split(",");
@@ -129,7 +131,7 @@ public class Main {
         return "Name not found";
     }
 
-    public void getMostPopularInRange(String gender, int startyear, int finalyear) throws FileNotFoundException {
+    public String[] getMostPopularInRange(String gender, int startyear, int finalyear) throws FileNotFoundException {
         Map<String, Integer> ranking = new HashMap<>();
         Map<String, Integer> years = new HashMap<>();
         for (int year = startyear; year <= finalyear; year++) {
@@ -148,14 +150,18 @@ public class Main {
         }
         SortedSet<String> keys = new TreeSet<>((a,b)-> ranking.get(b)-ranking.get(a));
         keys.addAll(years.keySet());
+        String[] results = new String[keys.size()];
         int i = 1;
         for (String key : keys) {
+            String result = i + ". " + key + " for " + years.get(key) + " years";
             System.out.println(i + ". " + key + " for " + years.get(key) + " years");
+            results[i-1] = result;
             i++;
         }
+        return results;
     }
 
-    public void mostPopularLetterGirls(int startyear, int finalyear) throws FileNotFoundException {
+    public String[] mostPopularLetterGirls(int startyear, int finalyear) throws FileNotFoundException {
         Map<String, Integer> popular = new HashMap<>();
         Map<String, SortedSet<String>> listNames = new HashMap<>();
         for (int year = startyear; year <= finalyear; year++) {
@@ -181,8 +187,17 @@ public class Main {
                 max = count;
             }
         }
+        SortedSet<String> set = listNames.get(mostPopularLetter);
+        String[] results = new String[set.size() + 1];
+        results[0] = mostPopularLetter;
         System.out.println("Most Popular Letter for Females: " + mostPopularLetter);
-        for (String name : listNames.get(mostPopularLetter)) System.out.println(name);
+        int i = 1;
+        for (String name : set) {
+            results[i] = name;
+            System.out.println(name);
+            i++;
+        }
+        return results;
     }
 
     public static void main (String[] args) throws FileNotFoundException {
@@ -205,10 +220,10 @@ public class Main {
 
         System.out.println("\nBasic Implementation #3");
         System.out.println(main.START_YEAR1 + " - " + main.FINAL_YEAR1);
-        main.getMostPopularInRange(main.GENDER4, main.START_YEAR1, main.FINAL_YEAR1);
+        String[] result1 = main.getMostPopularInRange(main.GENDER4, main.START_YEAR1, main.FINAL_YEAR1);
 
         System.out.println("\nBasic Implementation #4");
         System.out.println(main.START_YEAR2 + " - " + main.FINAL_YEAR2);
-        main.mostPopularLetterGirls(main.START_YEAR2, main.FINAL_YEAR2);
+        String[] result2 = main.mostPopularLetterGirls(main.START_YEAR2, main.FINAL_YEAR2);
     }
 }
