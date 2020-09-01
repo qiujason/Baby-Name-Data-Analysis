@@ -33,9 +33,27 @@ class MainTest {
         assertArrayEquals(new int[]{2, 110000}, testInstance.getCountByGenderLetterYear(2020, "F", "A"));
     }
 
-    @Test
-    void testGetRankingsNameGender() {
-    }
+//    @Test
+//    void testGetCountByGenderLetterYear() throws FileNotFoundException {
+//
+//    }
+//
+//    @Test
+//    void testGetCountByGenderLetterYear() throws FileNotFoundException {
+//
+//    }
+//
+//    @Test
+//    void testGetRankingsNameGender() {
+//    }
+//
+//    @Test
+//    void testGetRankingsNameGender() {
+//    }
+//
+//    @Test
+//    void testGetRankingsNameGender() {
+//    }
 
     @Test
     void testGetSameRank2020() throws FileNotFoundException {
@@ -53,10 +71,33 @@ class MainTest {
     }
 
     @Test
-    void getMostPopularInRange() throws FileNotFoundException {
+    void testGetMostPopularInRange20_22() throws FileNotFoundException {
+        assertArrayEquals(new String[]{"Emma for 2 years"}, testInstance.getMostPopularInRange("F", 2020, 2022).toArray());
     }
 
-    @org.junit.jupiter.api.Test
-    void mostPopularLetterGirls() {
+    @Test
+    void testGetMostPopularInRange20_21() throws FileNotFoundException {
+        assertArrayEquals(new String[]{"Clara for 1 years", "Emma for 1 years"},
+                testInstance.getMostPopularInRange("F", 2020, 2021).toArray());
     }
+
+    @Test
+    void testGetMostPopularInRange22_22() throws FileNotFoundException {
+        assertArrayEquals(new String[]{"John for 1 years"}, testInstance.getMostPopularInRange("M", 2022, 2022).toArray());
+    }
+//
+//    @Test
+//    void mostPopularLetterGirls() {
+//
+//    }
+//
+//    @Test
+//    void mostPopularLetterGirls() {
+//
+//    }
+//
+//    @Test
+//    void mostPopularLetterGirls() {
+//
+//    }
 }
