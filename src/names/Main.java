@@ -14,7 +14,7 @@ public class Main {
      */
     // CONFIGURATION
     // for all methods
-    private static final String DIRECTORY = "ssa_complete";
+    private static final String DIRECTORY = "ssa_test";
 
     // change arguments for each method
     // test implementation #1
@@ -35,7 +35,6 @@ public class Main {
     private final String GENDER3 = "M"; // M or F
 
     // basic implementation #3
-    private final int TOPRANKS = 10;
     private final int START_YEAR1 = 1990;
     private final int FINAL_YEAR1 = 2000;
     private final String GENDER4 = "M"; // M or F
@@ -176,14 +175,12 @@ public class Main {
                 }
             }
         }
-        SortedSet<String> keys = new TreeSet<>((a,b)-> years.get(b)-years.get(a));
-        keys.addAll(years.keySet());
         int max = 0;
-        if (keys.size() > 0) {
-            max = years.get(keys.first());
+        for (String key : years.keySet()) {
+            max = Math.max(max, years.get(key));
         }
         List<String> results = new ArrayList<>();
-        for (String key : keys) {
+        for (String key : years.keySet()) {
             if (years.get(key) == max) {
                 String result = key + " for " + years.get(key) + " years";
                 System.out.println(result);
