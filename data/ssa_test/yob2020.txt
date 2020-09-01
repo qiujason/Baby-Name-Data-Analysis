@@ -1,14 +1,14 @@
 Emma,F,100000
-Olivia,F,100000
+Sophia,F,90000
 Ava,F,80000
 Isabella,F,70000
-Sara,F,60000
+Olivia,F,60000
 Charlotte,F,50000
 Mia,F,40000
 Amelia,F,30000
 Harper,F,20000
 Evelyn,F,10000
-John,M,100000
+Liam,M,100000
 Noah,M,90000
 William,M,80000
 James,M,70000
