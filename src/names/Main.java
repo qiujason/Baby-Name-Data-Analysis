@@ -14,7 +14,6 @@ public class Main {
      */
     // CONFIGURATION
     // for all methods
-    private static final int RECENTYEAR = 2018;
     private static final String DIRECTORY = "ssa_complete";
 
     // change arguments for each method
@@ -132,8 +131,22 @@ public class Main {
                 }
             }
         }
+        // find most recent year
+        // get all text files within directory
+        File dir = new File("data/" + DIRECTORY);
+        File[] directoryListing = dir.listFiles();
+        int recentyear = -1;
+        if (directoryListing != null) {
+            for (File file : directoryListing) {
+                // get year from text file name by only extracting the numbers
+                String yearString = file.getName().replaceAll("[^0-9]", "");
+                // convert yearString to int
+                recentyear = Math.max(recentyear, Integer.parseInt(yearString));
+            }
+        }
         if (found) {
-            scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + RECENTYEAR + ".txt")); // most recent year
+            // scan file of most recent year
+            scanner = new Scanner(new File(dir + "/yob" + recentyear + ".txt")); // most recent year
             int num = 0;
             while (scanner.hasNextLine() && num < rank) {
                 String[] nameArray = scanner.nextLine().split(",");
