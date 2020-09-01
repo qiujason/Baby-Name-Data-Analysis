@@ -14,19 +14,19 @@ public class Main {
      */
     // CONFIGURATION
     // for all methods
-    private static final String DIRECTORY = "ssa_test";
+    private static final String DIRECTORY = "ssa_complete";
 
     // change arguments for each method
     // test implementation #1
-    private final int YEAR1 = 2016;
+    private final int YEAR1 = 1900;
 
     // test implementation #2
-    private final int YEAR2 = 1933;
+    private final int YEAR2 = 1900;
     private final String GENDER1 = "M"; // M or F
-    private final String LETTER = "F"; // First letter of names
+    private final String LETTER = "Q"; // First letter of names
 
     // basic implementation #1
-    private final String NAME1 = "Eddie";
+    private final String NAME1 = "Jason";
     private final String GENDER2 = "M"; // M or F
 
     // basic implementation #2
@@ -35,13 +35,13 @@ public class Main {
     private final String GENDER3 = "M"; // M or F
 
     // basic implementation #3
-    private final int START_YEAR1 = 1990;
-    private final int FINAL_YEAR1 = 2000;
+    private final int START_YEAR1 = 2000;
+    private final int FINAL_YEAR1 = 2009;
     private final String GENDER4 = "M"; // M or F
 
     // basic implementation #4
-    private final int START_YEAR2 = 1885;
-    private final int FINAL_YEAR2 = 2005;
+    private final int START_YEAR2 = 1880;
+    private final int FINAL_YEAR2 = 2018;
     
     public String[] getTopRankedYear(int year) throws FileNotFoundException {
         String[] topRanked = new String[2];
