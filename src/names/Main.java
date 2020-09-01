@@ -210,6 +210,7 @@ public class Main {
         int max = 0;
         for (char i = 'Z'; i >= 'A'; i--) {
             String letter = Character.toString(i);
+            if (popular.get(letter) == null) continue;
             int count = popular.get(letter);
             if (count >= max) {
                 mostPopularLetter = letter;
