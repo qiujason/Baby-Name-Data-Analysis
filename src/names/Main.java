@@ -13,47 +13,26 @@ public class Main {
      * Start of the program.
      */
     // CONFIGURATION
-    // for all methods
-    private static final String DIRECTORY = "ssa_complete";
+    private static final String DIRECTORY = "ssa_complete/yob";
+    private static final String FILETYPE = ".txt";
 
-    // change arguments for each method
-    // test implementation #1
-    private final int YEAR1 = 1900;
-
-    // test implementation #2
-    private final int YEAR2 = 1900;
-    private final String GENDER1 = "M"; // M or F
-    private final String LETTER = "Q"; // First letter of names
-
-    // basic implementation #1
-    private final String NAME1 = "Jason";
-    private final String GENDER2 = "M"; // M or F
-
-    // basic implementation #2
-    private final int YEAR3 = 1900;
-    private final String NAME2 = "Jason";
-    private final String GENDER3 = "M"; // M or F
-
-    // basic implementation #3
-    private final int START_YEAR1 = 2000;
-    private final int FINAL_YEAR1 = 2009;
-    private final String GENDER4 = "M"; // M or F
-
-    // basic implementation #4
-    private final int START_YEAR2 = 1880;
-    private final int FINAL_YEAR2 = 2018;
+    // put under public methods
+    private Scanner parseFile(int year) throws FileNotFoundException {
+        return new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
+    }
     
+    // TODO: add what it takes in, returns, example (javadoc)
     public String[] getTopRankedYear(int year) throws FileNotFoundException {
         String[] topRanked = new String[2];
         Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
         boolean firstFemale = false;
-        while (scanner.hasNextLine()) {
+        while (scanner.hasNextLine()) { //TODO: change to getting all the data in at once
             String[] nameArray = scanner.nextLine().split(",");
-            if (!firstFemale && nameArray[1].equals("F")) {
+            if (!firstFemale && nameArray[1].equals("F")) { // TODO: make global constant
                 firstFemale = true;
                 topRanked[0] = nameArray[0];
             }
-            else if (nameArray[1].equals("M")) {
+            else if (nameArray[1].equals("M")) { //TODO: global constant
                 topRanked[1] = nameArray[0];
                 break;
             }
@@ -66,12 +45,12 @@ public class Main {
 
     public int[] getCountByGenderLetterYear(int year, String gender, String letter) throws FileNotFoundException {
         int[] counts = new int[2];
-        Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
+        Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt")); // TODO: add other parts of string to directory constant
         while (scanner.hasNextLine()) {
             String[] nameArray = scanner.nextLine().split(",");
             if (nameArray[1].equals(gender) && nameArray[0].substring(0,1).equals(letter)) {
                 counts[0]++;
-                counts[1] += Integer.parseInt(nameArray[2]);
+                counts[1] += Integer.parseInt(nameArray[2]); //TODO: clarify in javadocs comment what a line would look like
             }
         }
         System.out.println(counts[0] + " different names");
@@ -234,26 +213,21 @@ public class Main {
         Main main = new Main();
 
         System.out.println("Test Implementation #1");
-        System.out.println(main.YEAR1);
-        String[] topRanked = main.getTopRankedYear(main.YEAR1);
+        String[] topRanked = main.getTopRankedYear(1900);
 
         System.out.println("\nTest Implementation #2");
-        System.out.println(main.YEAR2 + " - " + main.LETTER + " (" + main.GENDER1 + ")");
-        int[] counts = main.getCountByGenderLetterYear(main.YEAR2, main.GENDER1, main.LETTER);
+        int[] counts = main.getCountByGenderLetterYear(1900, "M", "Q");
 
         System.out.println("\nBasic Implementation #1");
-        System.out.println(main.NAME1 + " (" + main.GENDER2 + ")");
-        Map<Integer, Integer> rankings = main.getRankingsNameGender(main.NAME1, main.GENDER2);
+        Map<Integer, Integer> rankings = main.getRankingsNameGender("Jason", "M");
 
         System.out.println("\nBasic Implementation #2");
-        String name = main.getSameRank(main.NAME2, main.GENDER3, main.YEAR3);
+        String name = main.getSameRank("Jason", "M", 1900);
 
         System.out.println("\nBasic Implementation #3");
-        System.out.println(main.START_YEAR1 + " - " + main.FINAL_YEAR1);
-        List<String> result1 = main.getMostPopularInRange(main.GENDER4, main.START_YEAR1, main.FINAL_YEAR1);
+        List<String> result1 = main.getMostPopularInRange("M", 2000, 2009);
 
         System.out.println("\nBasic Implementation #4");
-        System.out.println(main.START_YEAR2 + " - " + main.FINAL_YEAR2);
-        String[] result2 = main.mostPopularLetterGirls(main.START_YEAR2, main.FINAL_YEAR2);
+        String[] result2 = main.mostPopularLetterGirls(1880, 2018);
     }
 }
