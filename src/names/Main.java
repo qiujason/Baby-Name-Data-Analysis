@@ -44,21 +44,9 @@ public class Main {
     }
 
     public Map<Integer,Integer> getRankingsByNameGender(String name, String gender) throws FileNotFoundException {
-        Map<Integer, Integer> rankings = new HashMap<>();
-        for (File file : getListOfFiles()) {
-            int year = getYearFromFileName(file);
-            Map<Integer, String> rankTable = getRankTable(year, gender);
-            rankTable.keySet().forEach(entry -> {
-                if (rankTable.get(entry).equals(name)) {
-                    rankings.put(year, entry);
-                }
-            });
-            rankings.putIfAbsent(year, -1);
-        }
-        for (int year : rankings.keySet()) {
-            System.out.println(year + " - " + rankings.get(year));
-        }
-        return rankings;
+        int startYear = getOldestYear();
+        int finalYear = getRecentYear();
+        return getRankingsByNameGenderInRange(startYear, finalYear, name, gender);
     }
 
     public String getSameRankInRecentYear(String name, String gender, int year) throws FileNotFoundException {
@@ -205,7 +193,7 @@ public class Main {
 
     private int getOldestYear() {
         File[] directoryListing = getListOfFiles();
-        int recentYear = -1;
+        int recentYear = 10000; // number impossible to be a year
         for (File file : directoryListing) {
             recentYear = Math.min(recentYear, getYearFromFileName(file));
         }
