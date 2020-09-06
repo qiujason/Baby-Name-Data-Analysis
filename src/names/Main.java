@@ -4,6 +4,7 @@ package names;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.function.BinaryOperator;
 
 
 public class Main {
@@ -40,12 +41,10 @@ public class Main {
         List<String[]> data = parseFile(year);
         data.stream()
                 .filter(nameArray -> nameArray[0].startsWith(letter) && nameArray[1].equals(gender))
-                .reduce()
-            if (nameArray[1].equals(gender) && nameArray[0].charAt(0) == letter) {
-                counts[0]++;
-                counts[1] += Integer.parseInt(nameArray[2]);
-            }
-        });
+                .forEach(nameArray -> {
+                    counts[0]++;
+                    counts[1] += Integer.parseInt(nameArray[2]);
+                });
         System.out.println(counts[0] + " different names");
         System.out.println(counts[1] + " total babies");
         return counts;
@@ -126,7 +125,7 @@ public class Main {
         }
         if (found) {
             // scan file of most recent year
-            scanner = new Scanner(new File(dir + "/yob" + recentyear + ".txt")); // most recent year
+            Scanner scanner = new Scanner(new File(dir + "/yob" + recentyear + ".txt")); // most recent year
             int num = 0;
             while (scanner.hasNextLine() && num < rank) {
                 String[] nameArray = scanner.nextLine().split(",");
@@ -227,7 +226,7 @@ public class Main {
         String[] topRanked = main.getTopRankedInYear(1900);
 
         System.out.println("\nTest Implementation #2");
-        int[] counts = main.getCountByGenderLetterYear(1900, "M", 'Q');
+        int[] counts = main.getCountByGenderLetterYear(1900, "M", "Q");
 
         System.out.println("\nBasic Implementation #1");
         Map<Integer, Integer> rankings = main.getRankingsNameGender("Jason", "M");
