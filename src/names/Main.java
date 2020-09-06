@@ -110,15 +110,7 @@ public class Main {
         Arrays.fill(charCounts, 0);
         Map<Character, SortedSet<String>> listNamesOfChar = new HashMap<>();
         for (int year = startYear; year <= finalYear; year++) {
-            List<String[]> data = parseFile(year).stream()
-                    .filter(nameArray -> nameArray[1].equals(FEMALE))
-                    .collect(Collectors.toList());
-            data.forEach(nameArray -> {
-                char letter = nameArray[0].charAt(0);
-                charCounts[letter]++;
-                listNamesOfChar.putIfAbsent(letter, new TreeSet<>());
-                listNamesOfChar.get(letter).add(nameArray[0]);
-            });
+            fillCountsAndNamesOfFirstLetters(year, FEMALE, charCounts, listNamesOfChar);
         }
 
         List<Integer> charCountsList = Arrays.asList(charCounts);
@@ -144,6 +136,19 @@ public class Main {
             data.add(scan.nextLine().split(","));
         }
         return data;
+    }
+
+    private void fillCountsAndNamesOfFirstLetters(int year, String gender, Integer[] charCounts,
+                                          Map<Character, SortedSet<String>> listNamesOfChar) throws FileNotFoundException {
+        List<String[]> data = parseFile(year).stream()
+                .filter(nameArray -> nameArray[1].equals(gender))
+                .collect(Collectors.toList());
+        data.forEach(nameArray -> {
+            char letter = nameArray[0].charAt(0);
+            charCounts[letter]++;
+            listNamesOfChar.putIfAbsent(letter, new TreeSet<>());
+            listNamesOfChar.get(letter).add(nameArray[0]);
+        });
     }
 
     private Map<Integer,String> getRankTable(int year, String gender) throws FileNotFoundException {
