@@ -131,14 +131,28 @@ public class Main {
     }
 
     public Map<String, Integer> findRankingDifferenceFirstLastYears(int startYear, int finalYear, String name, String gender) {
-        Map<Integer, Integer> rankings = findRankingsByNameGenderInRange(startYear, finalYear, name, gender);
+        Map<Integer, Integer> rankingStartYear = findRankingsByNameGenderInRange(startYear, startYear, name, gender);
+        Map<Integer, Integer> rankingFinalYear = findRankingsByNameGenderInRange(finalYear, finalYear, name, gender);
         Map<String, Integer> results = new HashMap<>();
-        int firstRanking = rankings.get(startYear);
-        int lastRanking = rankings.get(finalYear);
+        int firstRanking = rankingStartYear.get(startYear);
+        int lastRanking = rankingFinalYear.get(finalYear);
         results.put(Integer.toString(startYear), firstRanking);
         results.put(Integer.toString(finalYear), lastRanking);
         results.put("Difference (rankings up)", firstRanking-lastRanking);
         return results;
+    }
+
+    public String findNameLargestDifferenceFirstLastYears(int startYear, int finalYear, String gender) {
+        Map<Integer, String> rankTable = getRankTable(startYear, gender);
+        Map<String, Integer> differences = new HashMap<>();
+        rankTable.values().forEach(name -> {
+            Map<String, Integer> rankingDifferencesForName = findRankingDifferenceFirstLastYears(startYear, finalYear, name, gender);
+            differences.put(name, rankingDifferencesForName.get("Difference (rankings up)"));
+        });
+        return differences.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .get()
+                .getKey();
     }
 
     private List<String[]> parseFile(int year) {
@@ -155,6 +169,19 @@ public class Main {
         return data;
     }
 
+    private Map<Integer, String> getRankTable(int year, String gender) {
+        List<String[]> data = parseFile(year);
+        int rank = 1;
+        Map<Integer, String> rankTable = new HashMap<>();
+        for (String[] nameArray : data) {
+            if (nameArray[1].equals(gender)) {
+                rankTable.put(rank, nameArray[0]);
+                rank++;
+            }
+        }
+        return rankTable;
+    }
+
     private void fillCountsAndNamesOfFirstLetters(int year, String gender, Integer[] charCounts,
                                           Map<Character, SortedSet<String>> listNamesOfChar) {
         List<String[]> data = parseFile(year).stream()
@@ -166,19 +193,6 @@ public class Main {
             listNamesOfChar.putIfAbsent(letter, new TreeSet<>());
             listNamesOfChar.get(letter).add(nameArray[0]);
         });
-    }
-
-    private Map<Integer,String> getRankTable(int year, String gender) {
-        List<String[]> data = parseFile(year);
-        int rank = 1;
-        Map<Integer, String> rankTable = new HashMap<>();
-        for (String[] nameArray : data) {
-            if (nameArray[1].equals(gender)) {
-                rankTable.put(rank, nameArray[0]);
-                rank++;
-            }
-        }
-        return rankTable;
     }
 
     private File[] getListOfFiles() {
@@ -243,6 +257,7 @@ public class Main {
         rankingDifferences.forEach((k, ranking) -> System.out.println(k + ": " + ranking));
 
         System.out.println("\nComplete Implementation #3");
+        System.out.println(main.findNameLargestDifferenceFirstLastYears(1900, 2000, MALE));
         System.out.println("\nComplete Implementation #4");
         System.out.println("\nComplete Implementation #5");
         System.out.println("\nComplete Implementation #6");
