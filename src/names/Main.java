@@ -5,29 +5,26 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
-/**
- * Feel free to completely change this code or delete it entirely. 
- */
+
 public class Main {
-    /**
-     * Start of the program.
-     */
     // CONFIGURATION
-    private static final String DIRECTORY = "ssa_complete/yob";
+    private static final String DIRECTORY = "data/ssa_complete/yob";
     private static final String FILETYPE = ".txt";
+    private static final String FEMALE = "F";
+    private static final String MALE = "M";
     
     // TODO: add what it takes in, returns, example (javadoc)
-    public String[] getTopRankedYear(int year) throws FileNotFoundException {
+    //TODO: clarify in javadocs comment what a line would look like
+    public String[] getTopRankedInYear(int year) throws FileNotFoundException {
         String[] topRanked = new String[2];
-        Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
+        List<String[]> data = parseFile(year);
         boolean firstFemale = false;
-        while (scanner.hasNextLine()) { //TODO: change to getting all the data in at once
-            String[] nameArray = scanner.nextLine().split(",");
-            if (!firstFemale && nameArray[1].equals("F")) { // TODO: make global constant
+        for (String[] nameArray : data) {
+            if (!firstFemale && nameArray[1].equals(FEMALE)) { //TODO: convert to helper method
                 firstFemale = true;
                 topRanked[0] = nameArray[0];
             }
-            else if (nameArray[1].equals("M")) { //TODO: global constant
+            else if (nameArray[1].equals(MALE)) {
                 topRanked[1] = nameArray[0];
                 break;
             }
@@ -40,14 +37,15 @@ public class Main {
 
     public int[] getCountByGenderLetterYear(int year, String gender, String letter) throws FileNotFoundException {
         int[] counts = new int[2];
-        Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt")); // TODO: add other parts of string to directory constant
-        while (scanner.hasNextLine()) {
-            String[] nameArray = scanner.nextLine().split(",");
-            if (nameArray[1].equals(gender) && nameArray[0].substring(0,1).equals(letter)) {
+        List<String[]> data = parseFile(year);
+        data.stream()
+                .filter(nameArray -> nameArray[0].startsWith(letter) && nameArray[1].equals(gender))
+                .reduce()
+            if (nameArray[1].equals(gender) && nameArray[0].charAt(0) == letter) {
                 counts[0]++;
-                counts[1] += Integer.parseInt(nameArray[2]); //TODO: clarify in javadocs comment what a line would look like
+                counts[1] += Integer.parseInt(nameArray[2]);
             }
-        }
+        });
         System.out.println(counts[0] + " different names");
         System.out.println(counts[1] + " total babies");
         return counts;
@@ -92,10 +90,9 @@ public class Main {
 
     public String getSameRank(String name, String gender, int year) throws FileNotFoundException {
         int rank = 0;
-        Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
         boolean found = false;
-        while (scanner.hasNextLine()) {
-            String[] nameArray = scanner.nextLine().split(",");
+        ArrayList<String[]> data = new ArrayList<>();
+        for (String[] nameArray : data) {
             if (nameArray[1].equals(gender)) {
                 rank++;
                 if (nameArray[0].equals(name)) {
@@ -104,6 +101,16 @@ public class Main {
                 }
             }
         }
+//        while (scanner.hasNextLine()) {
+//            String[] nameArray = scanner.nextLine().split(",");
+//            if (nameArray[1].equals(gender)) {
+//                rank++;
+//                if (nameArray[0].equals(name)) {
+//                    found = true;
+//                    break;
+//                }
+//            }
+//        }
         // find most recent year
         // get all text files within directory
         File dir = new File("data/" + DIRECTORY);
@@ -171,7 +178,7 @@ public class Main {
             Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
             while (scanner.hasNextLine()) {
                 String[] nameArray = scanner.nextLine().split(",");
-                if (nameArray[1].equals("F")) {
+                if (nameArray[1].equals(FEMALE)) {
                     String letter = nameArray[0].substring(0, 1);
                     popular.putIfAbsent(letter, 0);
                     popular.put(letter, popular.get(letter) + Integer.parseInt(nameArray[2]));
@@ -217,10 +224,10 @@ public class Main {
         Main main = new Main();
 
         System.out.println("Test Implementation #1");
-        String[] topRanked = main.getTopRankedYear(1900);
+        String[] topRanked = main.getTopRankedInYear(1900);
 
         System.out.println("\nTest Implementation #2");
-        int[] counts = main.getCountByGenderLetterYear(1900, "M", "Q");
+        int[] counts = main.getCountByGenderLetterYear(1900, "M", 'Q');
 
         System.out.println("\nBasic Implementation #1");
         Map<Integer, Integer> rankings = main.getRankingsNameGender("Jason", "M");
