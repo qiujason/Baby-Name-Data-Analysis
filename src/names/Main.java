@@ -115,17 +115,16 @@ public class Main {
         return results;
     }
 
+    //TODO: handle null pointer exceptions
     public Map<Integer, Integer> findRankingsByNameGenderInRange(int startYear, int finalYear, String name, String gender) {
         Map<Integer, Integer> rankings = new HashMap<>();
         for (int year = startYear; year <= finalYear; year++) {
-            int currentYear = year; // necessary for lambda expression below
-            Map<Integer, String> rankTable = getRankTable(year, gender);
-            rankTable.keySet().forEach(entry -> {
-                if (rankTable.get(entry).equals(name)) {
-                    rankings.put(currentYear, entry);
-                }
-            });
-            rankings.putIfAbsent(year, -1);
+            Map<String, Integer> rankTableInverse = getRankTableInverse(year, gender);
+            try {
+                rankings.put(year, rankTableInverse.get(name));
+            } catch(NullPointerException e) {
+                rankings.put(year, null);
+            }
         }
         return rankings;
     }
@@ -134,20 +133,28 @@ public class Main {
         Map<Integer, Integer> rankingStartYear = findRankingsByNameGenderInRange(startYear, startYear, name, gender);
         Map<Integer, Integer> rankingFinalYear = findRankingsByNameGenderInRange(finalYear, finalYear, name, gender);
         Map<String, Integer> results = new HashMap<>();
-        int firstRanking = rankingStartYear.get(startYear);
-        int lastRanking = rankingFinalYear.get(finalYear);
-        results.put(Integer.toString(startYear), firstRanking);
-        results.put(Integer.toString(finalYear), lastRanking);
-        results.put("Difference (rankings up)", firstRanking-lastRanking);
-        return results;
+        try {
+            int firstRanking = rankingStartYear.get(startYear);
+            int lastRanking = rankingFinalYear.get(finalYear);
+            results.put(Integer.toString(startYear), firstRanking);
+            results.put(Integer.toString(finalYear), lastRanking);
+            results.put("Difference (rankings up)", firstRanking - lastRanking);
+            return results;
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     public String findNameLargestDifferenceFirstLastYears(int startYear, int finalYear, String gender) {
         Map<Integer, String> rankTable = getRankTable(startYear, gender);
         Map<String, Integer> differences = new HashMap<>();
         rankTable.values().forEach(name -> {
-            Map<String, Integer> rankingDifferencesForName = findRankingDifferenceFirstLastYears(startYear, finalYear, name, gender);
-            differences.put(name, rankingDifferencesForName.get("Difference (rankings up)"));
+            try {
+                Map<String, Integer> rankingDifferencesForName = findRankingDifferenceFirstLastYears(startYear, finalYear, name, gender);
+                differences.put(name, Math.abs(rankingDifferencesForName.get("Difference (rankings up)")));
+            } catch (NullPointerException ignored) {
+                // ignore; skip names that are not found in the dataset
+            }
         });
         return differences.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
@@ -157,8 +164,24 @@ public class Main {
 
     public int findAverageRankOverRange(int startYear, int finalYear, String name, String gender) {
         Map<Integer, Integer> rankings = findRankingsByNameGenderInRange(startYear, finalYear, name, gender);
-        int sum = rankings.values().stream().reduce(0, Integer::sum);
+        int sum = rankings.values().stream().reduce(0, (total, rank) -> {
+            if (rank == null) {
+                return total;
+            } else {
+                return total + rank;
+            }
+        });
         return sum/rankings.values().size();
+    }
+
+    public String findNameHighestAverageRank(int startYear, int finalYear, String gender) {
+        Map<Integer, String> rankTable = getRankTable(startYear, gender);
+        Map<String, Integer> averageRanks = new HashMap<>();
+        rankTable.values().forEach(name -> averageRanks.put(name, findAverageRankOverRange(startYear, finalYear, name, gender)));
+        return averageRanks.entrySet().stream()
+                .min(Map.Entry.comparingByValue())
+                .get()
+                .getKey();
     }
 
     private List<String[]> parseFile(int year) {
@@ -186,6 +209,14 @@ public class Main {
             }
         }
         return rankTable;
+    }
+
+    // hashmap is guaranteed to have unique keys and values
+    private Map<String, Integer> getRankTableInverse(int year, String gender) {
+        Map<Integer, String> rankTable = getRankTable(year, gender);
+        Map<String, Integer> rankTableInverse = new HashMap<>();
+        rankTable.forEach((rank, name) -> rankTableInverse.put(name, rank));
+        return rankTableInverse;
     }
 
     private void fillCountsAndNamesOfFirstLetters(int year, String gender, Integer[] charCounts,
@@ -260,15 +291,21 @@ public class Main {
 
         System.out.println("\nComplete Implementation #2");
         Map<String, Integer> rankingDifferences = main.findRankingDifferenceFirstLastYears(1900, 2000, "Jason", "M");
-        rankingDifferences.forEach((k, ranking) -> System.out.println(k + ": " + ranking));
+        if (rankingDifferences == null) {
+            System.out.println("Name not found in one of the years");
+        } else {
+            rankingDifferences.forEach((k, ranking) -> System.out.println(k + ": " + ranking));
+        }
 
         System.out.println("\nComplete Implementation #3");
-//        System.out.println(main.findNameLargestDifferenceFirstLastYears(1900, 2000, MALE));
+        System.out.println(main.findNameLargestDifferenceFirstLastYears(1900, 2000, MALE));
 
         System.out.println("\nComplete Implementation #4");
         System.out.println(main.findAverageRankOverRange(1970, 1980, "Jason", MALE));
 
         System.out.println("\nComplete Implementation #5");
+        System.out.println(main.findNameHighestAverageRank(1971, 1973, FEMALE));
+        
         System.out.println("\nComplete Implementation #6");
         System.out.println("\nComplete Implementation #7");
         System.out.println("\nComplete Implementation #8");
