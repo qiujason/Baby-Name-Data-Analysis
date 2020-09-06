@@ -10,15 +10,14 @@ import java.util.stream.Collectors;
 public class Main {
     // CONFIGURATION
     private static final String DIRECTORY = "data/ssa_complete/";
-    private static final String FILEPATH = DIRECTORY + "yob";
-//    private static final String FILETYPE = ".txt";
     private static final String FEMALE = "F";
     private static final String MALE = "M";
     private static final int TOPRANK = 1;
+    //TODO: global variables for namearray indices
     
     // TODO: add what it takes in, returns, example (javadoc)
     //TODO: clarify in javadocs comment what a line would look like
-    public String[] getTopRankedInYear(int year) throws FileNotFoundException {
+    public String[] getTopRankedInYear(int year) {
         String[] topRanked = new String[2];
         Map<Integer,String> maleRankTable = getRankTable(year, MALE);
         Map<Integer,String> femaleRankTable = getRankTable(year, FEMALE);
@@ -29,7 +28,7 @@ public class Main {
         return topRanked;
     }
 
-    public int[] getCountByGenderLetterYear(int year, String gender, String letter) throws FileNotFoundException {
+    public int[] getCountByGenderLetterYear(int year, String gender, String letter) {
         int[] counts = new int[2];
         List<String[]> data = parseFile(year);
         data.stream()
@@ -43,13 +42,13 @@ public class Main {
         return counts;
     }
 
-    public Map<Integer,Integer> getRankingsByNameGender(String name, String gender) throws FileNotFoundException {
+    public Map<Integer,Integer> getRankingsByNameGender(String name, String gender) {
         int startYear = getOldestYear();
         int finalYear = getRecentYear();
         return getRankingsByNameGenderInRange(startYear, finalYear, name, gender);
     }
 
-    public String getSameRankInRecentYear(String name, String gender, int year) throws FileNotFoundException {
+    public String getSameRankInRecentYear(String name, String gender, int year) {
         Map<Integer, String> rankTable = getRankTable(year, gender);
         int nameRank = -1;
         for (int rank : rankTable.keySet()) {
@@ -74,7 +73,7 @@ public class Main {
         }
     }
 
-    public List<String> getMostPopularInRange(String gender, int startYear, int finalYear) throws FileNotFoundException {
+    public List<String> getMostPopularInRange(String gender, int startYear, int finalYear) {
         Map<String, Integer> topRankPerYear = new HashMap<>();
         for (int year = startYear; year <= finalYear; year++) {
             Map<Integer, String> rankTable = getRankTable(year, gender);
@@ -91,7 +90,7 @@ public class Main {
         return results;
     }
 
-    public String[] mostPopularLetterGirls(int startYear, int finalYear) throws FileNotFoundException {
+    public String[] getMostPopularLetterGirls(int startYear, int finalYear) {
         Integer[] charCounts = new Integer[100];
         Arrays.fill(charCounts, 0);
         Map<Character, SortedSet<String>> listNamesOfChar = new HashMap<>();
@@ -116,7 +115,7 @@ public class Main {
     }
 
     public Map<Integer,Integer> getRankingsByNameGenderInRange(int startYear, int finalYear,
-                                                               String name, String gender) throws FileNotFoundException {
+                                                               String name, String gender) {
         Map<Integer, Integer> rankings = new HashMap<>();
         for (int year = startYear; year <= finalYear; year++) {
             int currentYear = year; // necessary for lambda expression below
@@ -134,17 +133,24 @@ public class Main {
         return rankings;
     }
 
-    private List<String[]> parseFile(int year) throws FileNotFoundException {
-        Scanner scan = new Scanner(new File(DIRECTORY + "yob" + year + ".txt"));
+//    public int[]
+
+    private List<String[]> parseFile(int year) {
+        String filepath = DIRECTORY + "yob" + year + ".txt";
         List<String[]> data = new ArrayList<>();
-        while (scan.hasNextLine()) {
-            data.add(scan.nextLine().split(","));
+        try {
+            Scanner scan = new Scanner(new File(filepath));
+            while (scan.hasNextLine()) {
+                data.add(scan.nextLine().split(","));
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println(filepath + " not found");
         }
         return data;
     }
 
     private void fillCountsAndNamesOfFirstLetters(int year, String gender, Integer[] charCounts,
-                                          Map<Character, SortedSet<String>> listNamesOfChar) throws FileNotFoundException {
+                                          Map<Character, SortedSet<String>> listNamesOfChar) {
         List<String[]> data = parseFile(year).stream()
                 .filter(nameArray -> nameArray[1].equals(gender))
                 .collect(Collectors.toList());
@@ -156,7 +162,7 @@ public class Main {
         });
     }
 
-    private Map<Integer,String> getRankTable(int year, String gender) throws FileNotFoundException {
+    private Map<Integer,String> getRankTable(int year, String gender) {
         List<String[]> data = parseFile(year);
         int rank = 1;
         Map<Integer, String> rankTable = new HashMap<>();
@@ -200,7 +206,7 @@ public class Main {
         return recentYear;
     }
 
-    public static void main (String[] args) throws FileNotFoundException {
+    public static void main (String[] args) {
         Main main = new Main();
 
         System.out.println("Test Implementation #1");
@@ -219,7 +225,7 @@ public class Main {
         List<String> result1 = main.getMostPopularInRange("M", 2000, 2009);
 
         System.out.println("\nBasic Implementation #4");
-        String[] result2 = main.mostPopularLetterGirls(1880, 2018);
+        String[] result2 = main.getMostPopularLetterGirls(1880, 2018);
 
         System.out.println("\nComplete Implementation #1");
         Map<Integer, Integer> rankingsInRange = main.getRankingsByNameGenderInRange(1900, 2000, "Jason", "M");
