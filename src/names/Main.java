@@ -184,6 +184,11 @@ public class Main {
                 .getKey();
     }
 
+    public int findAverageRankRecentYears(String name, String gender, int numYears) {
+        int recentYear = getRecentYear();
+        return findAverageRankOverRange(recentYear - numYears + 1, recentYear, name, gender);
+    }
+
     private List<String[]> parseFile(int year) {
         String filepath = DIRECTORY + "yob" + year + ".txt";
         List<String[]> data = new ArrayList<>();
@@ -213,9 +218,15 @@ public class Main {
 
     // hashmap is guaranteed to have unique keys and values
     private Map<String, Integer> getRankTableInverse(int year, String gender) {
-        Map<Integer, String> rankTable = getRankTable(year, gender);
+        List<String[]> data = parseFile(year);
+        int rank = 1;
         Map<String, Integer> rankTableInverse = new HashMap<>();
-        rankTable.forEach((rank, name) -> rankTableInverse.put(name, rank));
+        for (String[] nameArray : data) {
+            if (nameArray[1].equals(gender)) {
+                rankTableInverse.put(nameArray[0], rank);
+                rank++;
+            }
+        }
         return rankTableInverse;
     }
 
@@ -301,12 +312,14 @@ public class Main {
         System.out.println(main.findNameLargestDifferenceFirstLastYears(1900, 2000, MALE));
 
         System.out.println("\nComplete Implementation #4");
-        System.out.println(main.findAverageRankOverRange(1970, 1980, "Jason", MALE));
+        System.out.println(main.findAverageRankOverRange(2014, 2018, "Jason", MALE));
 
         System.out.println("\nComplete Implementation #5");
         System.out.println(main.findNameHighestAverageRank(1971, 1973, FEMALE));
         
         System.out.println("\nComplete Implementation #6");
+        System.out.println(main.findAverageRankRecentYears("Jason", MALE, 5));
+
         System.out.println("\nComplete Implementation #7");
         System.out.println("\nComplete Implementation #8");
         System.out.println("\nComplete Implementation #9");
