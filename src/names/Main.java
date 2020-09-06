@@ -106,39 +106,32 @@ public class Main {
     }
 
     public String[] mostPopularLetterGirls(int startYear, int finalYear) throws FileNotFoundException {
-        int[] charCounts = new int[300];
-        Map<String, SortedSet<String>> listNames = new HashMap<>();
+        Integer[] charCounts = new Integer[100];
+        Arrays.fill(charCounts, 0);
+        Map<Character, SortedSet<String>> listNamesOfChar = new HashMap<>();
         for (int year = startYear; year <= finalYear; year++) {
-            Map<Integer, String> rankTable = getRankTable(year, FEMALE);
+            List<String[]> data = parseFile(year).stream()
+                    .filter(nameArray -> nameArray[1].equals(FEMALE))
+                    .collect(Collectors.toList());
+            data.forEach(nameArray -> {
+                char letter = nameArray[0].charAt(0);
+                charCounts[letter]++;
+                listNamesOfChar.putIfAbsent(letter, new TreeSet<>());
+                listNamesOfChar.get(letter).add(nameArray[0]);
+            });
+        }
 
-                if (nameArray[1].equals(FEMALE)) {
-                    String letter = nameArray[0].substring(0, 1);
-                    popular.putIfAbsent(letter, 0);
-                    popular.put(letter, popular.get(letter) + Integer.parseInt(nameArray[2]));
-                    listNames.putIfAbsent(letter, new TreeSet<>());
-                    listNames.get(letter).add(nameArray[0]);
-                }
-            }
-        }
-        String mostPopularLetter = "";
-        int max = 0;
-        for (char i = 'Z'; i >= 'A'; i--) {
-            String letter = Character.toString(i);
-            if (popular.get(letter) == null) continue;
-            int count = popular.get(letter);
-            if (count >= max) {
-                mostPopularLetter = letter;
-                max = count;
-            }
-        }
-        SortedSet<String> set = listNames.get(mostPopularLetter);
-        String[] results = new String[set.size() + 1];
-        results[0] = mostPopularLetter;
+        List<Integer> charCountsList = Arrays.asList(charCounts);
+        char mostPopularLetter = (char)charCountsList.indexOf(Collections.max(charCountsList));
+
+        SortedSet<String> listOfNames = listNamesOfChar.get(mostPopularLetter);
+        String[] results = new String[listOfNames.size() + 1];
+        results[0] = Character.toString(mostPopularLetter);
         System.out.println("Most Popular Letter for Females: " + mostPopularLetter);
         int i = 1;
-        for (String name : set) {
+        for (String name : listOfNames) {
             results[i] = name;
-            System.out.println(name);
+            System.out.print(name + ", ");
             i++;
         }
         return results;
