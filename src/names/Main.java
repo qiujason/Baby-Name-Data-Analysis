@@ -75,17 +75,15 @@ public class Main {
             return "Name not found";
         }
 
-        // get most recent year from dataset
-        File[] directoryListing = getListOfFiles();
-        int recentYear = -1;
-        for (File file : directoryListing) {
-            recentYear = Math.max(recentYear, getYearFromFileName(file));
+        int recentYear = getRecentYear();
+        if (recentYear != -1) {
+            Map<Integer, String> recentYearRankTable = getRankTable(recentYear, gender);
+            String matchedName = recentYearRankTable.get(nameRank);
+            System.out.println(matchedName);
+            return matchedName;
+        } else {
+            return "No files found";
         }
-
-        Map<Integer, String> recentYearRankTable = getRankTable(recentYear, gender);
-        String matchedName = recentYearRankTable.get(nameRank);
-        System.out.println(matchedName);
-        return matchedName;
     }
 
     public List<String> getMostPopularInRange(String gender, int startYear, int finalYear) throws FileNotFoundException {
@@ -127,6 +125,25 @@ public class Main {
             i++;
         }
         return results;
+    }
+
+    public Map<Integer,Integer> getRankingsByNameGenderInRange(int startYear, int finalYear,
+                                                               String name, String gender) throws FileNotFoundException {
+        Map<Integer, Integer> rankings = new HashMap<>();
+        for (int year = startYear; year <= finalYear; year++) {
+            int currentYear = year; // necessary for lambda expression below
+            Map<Integer, String> rankTable = getRankTable(year, gender);
+            rankTable.keySet().forEach(entry -> {
+                if (rankTable.get(entry).equals(name)) {
+                    rankings.put(currentYear, entry);
+                }
+            });
+            rankings.putIfAbsent(year, -1);
+        }
+        for (int year : rankings.keySet()) {
+            System.out.println(year + " - " + rankings.get(year));
+        }
+        return rankings;
     }
 
     private List<String[]> parseFile(int year) throws FileNotFoundException {
@@ -177,6 +194,24 @@ public class Main {
         return Integer.parseInt(yearString);
     }
 
+    private int getRecentYear() {
+        File[] directoryListing = getListOfFiles();
+        int recentYear = -1;
+        for (File file : directoryListing) {
+            recentYear = Math.max(recentYear, getYearFromFileName(file));
+        }
+        return recentYear;
+    }
+
+    private int getOldestYear() {
+        File[] directoryListing = getListOfFiles();
+        int recentYear = -1;
+        for (File file : directoryListing) {
+            recentYear = Math.min(recentYear, getYearFromFileName(file));
+        }
+        return recentYear;
+    }
+
     public static void main (String[] args) throws FileNotFoundException {
         Main main = new Main();
 
@@ -197,5 +232,8 @@ public class Main {
 
         System.out.println("\nBasic Implementation #4");
         String[] result2 = main.mostPopularLetterGirls(1880, 2018);
+
+        System.out.println("\nComplete Implementation #1");
+        Map<Integer, Integer> rankingsInRange = main.getRankingsByNameGenderInRange(1900, 2000, "Jason", "M");
     }
 }
