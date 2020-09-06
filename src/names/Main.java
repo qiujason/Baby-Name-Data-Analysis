@@ -104,11 +104,9 @@ public class Main {
         int mostFrequent = Collections.max(topRankPerYear.values());
         List<String> results = topRankPerYear.entrySet().stream()
                 .filter(entry -> entry.getValue() == mostFrequent)
-                .map(Map.Entry::getKey)
+                .map(entry -> entry.getKey() + " for " + entry.getValue() + " years")
                 .collect(Collectors.toList());
-        for (String result : results) {
-            System.out.println(result);
-        }
+        results.forEach(System.out::println);
         return results;
     }
 
