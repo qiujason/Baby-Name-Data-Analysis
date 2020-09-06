@@ -42,7 +42,7 @@ public class Main {
         return counts;
     }
 
-    public Map<Integer,Integer> getRankingsNameGender(String name, String gender) throws FileNotFoundException {
+    public Map<Integer,Integer> getRankingsByNameGender(String name, String gender) throws FileNotFoundException {
         Map<Integer, Integer> rankings = new HashMap<>();
         for (File file : getListOfFiles()) {
             int year = getYearFromFileName(file);
@@ -66,7 +66,7 @@ public class Main {
         return rankings;
     }
 
-    public String getSameRank(String name, String gender, int year) throws FileNotFoundException {
+    public String getSameRankInRecentYear(String name, String gender, int year) throws FileNotFoundException {
         List<String[]> data = parseFile(year);
         Map<Integer, String> rankTable = getRankTable(data, gender);
         int nameRank = -1;
@@ -77,59 +77,22 @@ public class Main {
             }
         }
         if (nameRank == -1) {
+            System.out.println("Name not found");
             return "Name not found";
         }
-//        boolean found = false;
-//        ArrayList<String[]> data = new ArrayList<>();
-//        for (String[] nameArray : data) {
-//            if (nameArray[1].equals(gender)) {
-//                rank++;
-//                if (nameArray[0].equals(name)) {
-//                    found = true;
-//                    break;
-//                }
-//            }
-//        }
-//        while (scanner.hasNextLine()) {
-//            String[] nameArray = scanner.nextLine().split(",");
-//            if (nameArray[1].equals(gender)) {
-//                rank++;
-//                if (nameArray[0].equals(name)) {
-//                    found = true;
-//                    break;
-//                }
-//            }
-//        }
-        // find most recent year
-        // get all text files within directory
-        File dir = new File("data/" + FILEPATH);
-        File[] directoryListing = dir.listFiles();
+
+        // get most recent year from dataset
+        File[] directoryListing = getListOfFiles();
         int recentyear = -1;
-        if (directoryListing != null) {
-            for (File file : directoryListing) {
-                // get year from text file name by only extracting the numbers
-                String yearString = file.getName().replaceAll("[^0-9]", "");
-                // convert yearString to int
-                recentyear = Math.max(recentyear, Integer.parseInt(yearString));
-            }
+        for (File file : directoryListing) {
+            recentyear = Math.max(recentyear, getYearFromFileName(file));
         }
-        if (found) {
-            // scan file of most recent year
-            Scanner scanner = new Scanner(new File(dir + "/yob" + recentyear + ".txt")); // most recent year
-            int num = 0;
-            while (scanner.hasNextLine() && num < rank) {
-                String[] nameArray = scanner.nextLine().split(",");
-                if (nameArray[1].equals(gender)) {
-                    num++;
-                    if (num == rank) {
-                        System.out.println(nameArray[0]);
-                        return nameArray[0];
-                    }
-                }
-            }
-        }
-        System.out.println("Name not found");
-        return "Name not found";
+
+        List<String[]> recentYearData = parseFile(recentyear);
+        Map<Integer, String> recentYearRankTable = getRankTable(recentYearData, gender);
+        String matchedName = recentYearRankTable.get(nameRank);
+        System.out.println(matchedName);
+        return matchedName;
     }
 
     public List<String> getMostPopularInRange(String gender, int startyear, int finalyear) throws FileNotFoundException {
@@ -244,7 +207,7 @@ public class Main {
         int[] counts = main.getCountByGenderLetterYear(1900, "M", "Q");
 
         System.out.println("\nBasic Implementation #1");
-        Map<Integer, Integer> rankings = main.getRankingsNameGender("Jason", "M");
+        Map<Integer, Integer> rankings = main.getRankingsByNameGender("Jason", "M");
 
         System.out.println("\nBasic Implementation #2");
         String name = main.getSameRank("Jason", "M", 1900);
