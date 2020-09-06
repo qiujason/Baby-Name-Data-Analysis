@@ -155,6 +155,12 @@ public class Main {
                 .getKey();
     }
 
+    public int findAverageRankOverRange(int startYear, int finalYear, String name, String gender) {
+        Map<Integer, Integer> rankings = findRankingsByNameGenderInRange(startYear, finalYear, name, gender);
+        int sum = rankings.values().stream().reduce(0, Integer::sum);
+        return sum/rankings.values().size();
+    }
+
     private List<String[]> parseFile(int year) {
         String filepath = DIRECTORY + "yob" + year + ".txt";
         List<String[]> data = new ArrayList<>();
@@ -257,8 +263,11 @@ public class Main {
         rankingDifferences.forEach((k, ranking) -> System.out.println(k + ": " + ranking));
 
         System.out.println("\nComplete Implementation #3");
-        System.out.println(main.findNameLargestDifferenceFirstLastYears(1900, 2000, MALE));
+//        System.out.println(main.findNameLargestDifferenceFirstLastYears(1900, 2000, MALE));
+
         System.out.println("\nComplete Implementation #4");
+        System.out.println(main.findAverageRankOverRange(1970, 1980, "Jason", MALE));
+
         System.out.println("\nComplete Implementation #5");
         System.out.println("\nComplete Implementation #6");
         System.out.println("\nComplete Implementation #7");
