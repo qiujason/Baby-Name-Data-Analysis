@@ -10,7 +10,7 @@ public class Main {
     // CONFIGURATION
     private static final String DIRECTORY = "data/ssa_complete/";
     private static final String FILEPATH = DIRECTORY + "yob";
-    private static final String FILETYPE = ".txt";
+//    private static final String FILETYPE = ".txt";
     private static final String FEMALE = "F";
     private static final String MALE = "M";
     
@@ -19,9 +19,10 @@ public class Main {
     public String[] getTopRankedInYear(int year) throws FileNotFoundException {
         String[] topRanked = new String[2];
         List<String[]> data = parseFile(year);
-        Map<Integer,String>[] rankTableByGender = getRankTable(data);
-        topRanked[0] = rankTableByGender[0].get(1);
-        topRanked[1] = rankTableByGender[1].get(1);
+        Map<Integer,String> maleRankTable = getRankTable(data, MALE);
+        Map<Integer,String> femaleRankTable = getRankTable(data, FEMALE);
+        topRanked[0] = maleRankTable.get(1);
+        topRanked[1] = femaleRankTable.get(1);
         System.out.println(topRanked[0]);
         System.out.println(topRanked[1]);
         return topRanked;
@@ -45,6 +46,8 @@ public class Main {
         Map<Integer, Integer> rankings = new HashMap<>();
         for (File file : getListOfFiles()) {
             int year = getYearFromFileName(file);
+
+
             boolean found = false;
             int rank = 1;
             List<String[]> data = parseFile(year);
@@ -193,7 +196,7 @@ public class Main {
     }
 
     private ArrayList<String[]> parseFile(int year) throws FileNotFoundException {
-        Scanner scan = new Scanner(new File(FILEPATH + year + FILETYPE));
+        Scanner scan = new Scanner(new File(DIRECTORY + "yob" + year + ".txt"));
         ArrayList<String[]> data = new ArrayList<>();
         while (scan.hasNextLine()) {
             data.add(scan.nextLine().split(","));
@@ -201,21 +204,16 @@ public class Main {
         return data;
     }
 
-    private Map<Integer,String>[] getRankTable(List<String[]> data) {
-        int maleRank = 1;
-        int femaleRank = 1;
-        Map<Integer, String> maleRankTable = new HashMap<>();
-        Map<Integer, String> femaleRankTable = new HashMap<>();
+    private Map<Integer,String> getRankTable(List<String[]> data, String gender) {
+        int rank = 1;
+        Map<Integer, String> rankTable = new HashMap<>();
         for (String[] nameArray : data) {
-            if (nameArray[1].equals(MALE)) {
-                maleRankTable.put(maleRank, nameArray[0]);
-                maleRank++;
-            } else if (nameArray[1].equals(FEMALE)) {
-                femaleRankTable.put(femaleRank, nameArray[0]);
-                femaleRank++;
+            if (nameArray[1].equals(gender)) {
+                rankTable.put(rank, nameArray[0]);
+                rank++;
             }
         }
-        return new Map[]{maleRankTable, femaleRankTable};
+        return rankTable;
     }
 
     private File[] getListOfFiles() {
