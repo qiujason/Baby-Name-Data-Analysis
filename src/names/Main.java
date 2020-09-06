@@ -101,16 +101,6 @@ public class Main {
             topRankPerYear.putIfAbsent(topRankedName, 0);
             topRankPerYear.put(topRankedName, topRankPerYear.get(topRankedName) + 1);
         }
-//            Scanner scanner = new Scanner(new File(DIRECTORY + "/yob" + year + ".txt"));
-//            while (scanner.hasNextLine()) {
-//                String[] nameArray = scanner.nextLine().split(",");
-//                if (nameArray[1].equals(gender)) {
-//                    years.putIfAbsent(nameArray[0], 0);
-//                    years.put(nameArray[0], years.get(nameArray[0]) + 1);
-//                    break;
-//                }
-//            }
-//        }
         int mostFrequent = Collections.max(topRankPerYear.values());
         List<String> results = topRankPerYear.entrySet().stream()
                 .filter(entry -> entry.getValue() == mostFrequent)
@@ -119,17 +109,6 @@ public class Main {
         for (String result : results) {
             System.out.println(result);
         }
-//        for (String key : topRankPerYear.keySet()) {
-//            max = Math.max(max, topRankPerYear.get(key));
-//        }
-//        List<String> results = new ArrayList<>();
-//        for (String key : topRankPerYear.keySet()) {
-//            if (topRankPerYear.get(key) == max) {
-//                String result = key + " for " + topRankPerYear.get(key) + " years";
-//                System.out.println(result);
-//                results.add(result);
-//            }
-//        }
         return results;
     }
 
