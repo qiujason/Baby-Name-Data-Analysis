@@ -20,9 +20,8 @@ public class Main {
     //TODO: clarify in javadocs comment what a line would look like
     public String[] getTopRankedInYear(int year) throws FileNotFoundException {
         String[] topRanked = new String[2];
-        List<String[]> data = parseFile(year);
-        Map<Integer,String> maleRankTable = getRankTable(data, MALE);
-        Map<Integer,String> femaleRankTable = getRankTable(data, FEMALE);
+        Map<Integer,String> maleRankTable = getRankTable(year, MALE);
+        Map<Integer,String> femaleRankTable = getRankTable(year, FEMALE);
         topRanked[0] = maleRankTable.get(TOPRANK);
         topRanked[1] = femaleRankTable.get(TOPRANK);
         System.out.println(topRanked[0]);
@@ -48,8 +47,7 @@ public class Main {
         Map<Integer, Integer> rankings = new HashMap<>();
         for (File file : getListOfFiles()) {
             int year = getYearFromFileName(file);
-            List<String[]> data = parseFile(year);
-            Map<Integer, String> rankTable = getRankTable(data, gender);
+            Map<Integer, String> rankTable = getRankTable(year, gender);
             rankTable.keySet().forEach(entry -> {
                 if (rankTable.get(entry).equals(name)) {
                     rankings.put(year, entry);
@@ -64,8 +62,7 @@ public class Main {
     }
 
     public String getSameRankInRecentYear(String name, String gender, int year) throws FileNotFoundException {
-        List<String[]> data = parseFile(year);
-        Map<Integer, String> rankTable = getRankTable(data, gender);
+        Map<Integer, String> rankTable = getRankTable(year, gender);
         int nameRank = -1;
         for (int rank : rankTable.keySet()) {
             if (rankTable.get(rank).equals(name)) {
@@ -85,8 +82,7 @@ public class Main {
             recentYear = Math.max(recentYear, getYearFromFileName(file));
         }
 
-        List<String[]> recentYearData = parseFile(recentYear);
-        Map<Integer, String> recentYearRankTable = getRankTable(recentYearData, gender);
+        Map<Integer, String> recentYearRankTable = getRankTable(recentYear, gender);
         String matchedName = recentYearRankTable.get(nameRank);
         System.out.println(matchedName);
         return matchedName;
@@ -95,8 +91,7 @@ public class Main {
     public List<String> getMostPopularInRange(String gender, int startYear, int finalYear) throws FileNotFoundException {
         Map<String, Integer> topRankPerYear = new HashMap<>();
         for (int year = startYear; year <= finalYear; year++) {
-            List<String[]> data = parseFile(year);
-            Map<Integer, String> rankTable = getRankTable(data, gender);
+            Map<Integer, String> rankTable = getRankTable(year, gender);
             String topRankedName = rankTable.get(TOPRANK);
             topRankPerYear.putIfAbsent(topRankedName, 0);
             topRankPerYear.put(topRankedName, topRankPerYear.get(topRankedName) + 1);
@@ -110,13 +105,12 @@ public class Main {
         return results;
     }
 
-    public String[] mostPopularLetterGirls(int startyear, int finalyear) throws FileNotFoundException {
-        Map<String, Integer> popular = new HashMap<>();
+    public String[] mostPopularLetterGirls(int startYear, int finalYear) throws FileNotFoundException {
+        int[] charCounts = new int[300];
         Map<String, SortedSet<String>> listNames = new HashMap<>();
-        for (int year = startyear; year <= finalyear; year++) {
-            Scanner scanner = new Scanner(new File("data/" + FILEPATH + "/yob" + year + ".txt"));
-            while (scanner.hasNextLine()) {
-                String[] nameArray = scanner.nextLine().split(",");
+        for (int year = startYear; year <= finalYear; year++) {
+            Map<Integer, String> rankTable = getRankTable(year, FEMALE);
+
                 if (nameArray[1].equals(FEMALE)) {
                     String letter = nameArray[0].substring(0, 1);
                     popular.putIfAbsent(letter, 0);
@@ -159,7 +153,8 @@ public class Main {
         return data;
     }
 
-    private Map<Integer,String> getRankTable(List<String[]> data, String gender) {
+    private Map<Integer,String> getRankTable(int year, String gender) throws FileNotFoundException {
+        List<String[]> data = parseFile(year);
         int rank = 1;
         Map<Integer, String> rankTable = new HashMap<>();
         for (String[] nameArray : data) {
