@@ -4,6 +4,7 @@ package names;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class Main {
@@ -13,6 +14,7 @@ public class Main {
 //    private static final String FILETYPE = ".txt";
     private static final String FEMALE = "F";
     private static final String MALE = "M";
+    private static final int TOPRANK = 1;
     
     // TODO: add what it takes in, returns, example (javadoc)
     //TODO: clarify in javadocs comment what a line would look like
@@ -21,8 +23,8 @@ public class Main {
         List<String[]> data = parseFile(year);
         Map<Integer,String> maleRankTable = getRankTable(data, MALE);
         Map<Integer,String> femaleRankTable = getRankTable(data, FEMALE);
-        topRanked[0] = maleRankTable.get(1);
-        topRanked[1] = femaleRankTable.get(1);
+        topRanked[0] = maleRankTable.get(TOPRANK);
+        topRanked[1] = femaleRankTable.get(TOPRANK);
         System.out.println(topRanked[0]);
         System.out.println(topRanked[1]);
         return topRanked;
@@ -48,17 +50,12 @@ public class Main {
             int year = getYearFromFileName(file);
             List<String[]> data = parseFile(year);
             Map<Integer, String> rankTable = getRankTable(data, gender);
-            boolean found = false;
-            for (int rank : rankTable.keySet()) {
-                if (rankTable.get(rank).equals(name)) {
-                    rankings.put(year, rank);
-                    found = true;
-                    break;
+            rankTable.keySet().forEach(entry -> {
+                if (rankTable.get(entry).equals(name)) {
+                    rankings.put(year, entry);
                 }
-            }
-            if (!found) {
-                rankings.put(year, -1);
-            }
+            });
+            rankings.putIfAbsent(year, -1);
         }
         for (int year : rankings.keySet()) {
             System.out.println(year + " - " + rankings.get(year));
@@ -83,43 +80,56 @@ public class Main {
 
         // get most recent year from dataset
         File[] directoryListing = getListOfFiles();
-        int recentyear = -1;
+        int recentYear = -1;
         for (File file : directoryListing) {
-            recentyear = Math.max(recentyear, getYearFromFileName(file));
+            recentYear = Math.max(recentYear, getYearFromFileName(file));
         }
 
-        List<String[]> recentYearData = parseFile(recentyear);
+        List<String[]> recentYearData = parseFile(recentYear);
         Map<Integer, String> recentYearRankTable = getRankTable(recentYearData, gender);
         String matchedName = recentYearRankTable.get(nameRank);
         System.out.println(matchedName);
         return matchedName;
     }
 
-    public List<String> getMostPopularInRange(String gender, int startyear, int finalyear) throws FileNotFoundException {
-        Map<String, Integer> years = new HashMap<>();
-        for (int year = startyear; year <= finalyear; year++) {
-            Scanner scanner = new Scanner(new File("data/" + FILEPATH + "/yob" + year + ".txt"));
-            while (scanner.hasNextLine()) {
-                String[] nameArray = scanner.nextLine().split(",");
-                if (nameArray[1].equals(gender)) {
-                    years.putIfAbsent(nameArray[0], 0);
-                    years.put(nameArray[0], years.get(nameArray[0]) + 1);
-                    break;
-                }
-            }
+    public List<String> getMostPopularInRange(String gender, int startYear, int finalYear) throws FileNotFoundException {
+        Map<String, Integer> topRankPerYear = new HashMap<>();
+        for (int year = startYear; year <= finalYear; year++) {
+            List<String[]> data = parseFile(year);
+            Map<Integer, String> rankTable = getRankTable(data, gender);
+            String topRankedName = rankTable.get(TOPRANK);
+            topRankPerYear.putIfAbsent(topRankedName, 0);
+            topRankPerYear.put(topRankedName, topRankPerYear.get(topRankedName) + 1);
         }
-        int max = 0;
-        for (String key : years.keySet()) {
-            max = Math.max(max, years.get(key));
+//            Scanner scanner = new Scanner(new File(DIRECTORY + "/yob" + year + ".txt"));
+//            while (scanner.hasNextLine()) {
+//                String[] nameArray = scanner.nextLine().split(",");
+//                if (nameArray[1].equals(gender)) {
+//                    years.putIfAbsent(nameArray[0], 0);
+//                    years.put(nameArray[0], years.get(nameArray[0]) + 1);
+//                    break;
+//                }
+//            }
+//        }
+        int mostFrequent = Collections.max(topRankPerYear.values());
+        List<String> results = topRankPerYear.entrySet().stream()
+                .filter(entry -> entry.getValue() == mostFrequent)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        for (String result : results) {
+            System.out.println(result);
         }
-        List<String> results = new ArrayList<>();
-        for (String key : years.keySet()) {
-            if (years.get(key) == max) {
-                String result = key + " for " + years.get(key) + " years";
-                System.out.println(result);
-                results.add(result);
-            }
-        }
+//        for (String key : topRankPerYear.keySet()) {
+//            max = Math.max(max, topRankPerYear.get(key));
+//        }
+//        List<String> results = new ArrayList<>();
+//        for (String key : topRankPerYear.keySet()) {
+//            if (topRankPerYear.get(key) == max) {
+//                String result = key + " for " + topRankPerYear.get(key) + " years";
+//                System.out.println(result);
+//                results.add(result);
+//            }
+//        }
         return results;
     }
 
@@ -163,9 +173,9 @@ public class Main {
         return results;
     }
 
-    private ArrayList<String[]> parseFile(int year) throws FileNotFoundException {
+    private List<String[]> parseFile(int year) throws FileNotFoundException {
         Scanner scan = new Scanner(new File(DIRECTORY + "yob" + year + ".txt"));
-        ArrayList<String[]> data = new ArrayList<>();
+        List<String[]> data = new ArrayList<>();
         while (scan.hasNextLine()) {
             data.add(scan.nextLine().split(","));
         }
@@ -210,7 +220,7 @@ public class Main {
         Map<Integer, Integer> rankings = main.getRankingsByNameGender("Jason", "M");
 
         System.out.println("\nBasic Implementation #2");
-        String name = main.getSameRank("Jason", "M", 1900);
+        String name = main.getSameRankInRecentYear("Jason", "M", 1900);
 
         System.out.println("\nBasic Implementation #3");
         List<String> result1 = main.getMostPopularInRange("M", 2000, 2009);
