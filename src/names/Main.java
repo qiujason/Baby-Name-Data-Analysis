@@ -4,12 +4,12 @@ package names;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.function.BinaryOperator;
 
 
 public class Main {
     // CONFIGURATION
-    private static final String DIRECTORY = "data/ssa_complete/yob";
+    private static final String DIRECTORY = "data/ssa_complete/";
+    private static final String FILEPATH = DIRECTORY + "yob";
     private static final String FILETYPE = ".txt";
     private static final String FEMALE = "F";
     private static final String MALE = "M";
@@ -52,33 +52,22 @@ public class Main {
 
     public Map<Integer,Integer> getRankingsNameGender(String name, String gender) throws FileNotFoundException {
         Map<Integer, Integer> rankings = new HashMap<>();
-        String filepath = "data/" + DIRECTORY;
-        File dir = new File(filepath);
-        File[] directoryListing = dir.listFiles();
-        if (directoryListing != null) {
-            for (File file : directoryListing) {
-                // get year from text file name by only extracting the numbers
-                String yearString = file.getName().replaceAll("[^0-9]","");
-                // convert yearString to int
-                int year = Integer.parseInt(yearString);
-                Scanner scanner = new Scanner(file);
-                boolean found = false;
-                int rank = 1;
-                while (scanner.hasNextLine()) {
-                    String[] nameArray = scanner.nextLine().split(",");
-                    if (nameArray[1].equals(gender)) {
-                        if (nameArray[0].equals(name)) {
-                            rankings.put(year, rank);
-                            found = true;
-                            break;
-                        }
-                        rank++;
-                    }
+        for (File file : getListOfFiles()) {
+            int year = getYearFromFileName(file);
+            boolean found = false;
+            int rank = 1;
+            List<String[]> data = parseFile(year);
+            for (String[] nameArray : data) {
+                if (nameArray[0].equals(name)) {
+                    rankings.put(year, rank);
+                    found = true;
+                    break;
                 }
-                // name not found
-                if (!found) {
-                    rankings.put(year, -1);
-                }
+                rank++;
+            }
+            // name not found
+            if (!found) {
+                rankings.put(year, -1);
             }
         }
         for (int year : rankings.keySet()) {
@@ -112,7 +101,7 @@ public class Main {
 //        }
         // find most recent year
         // get all text files within directory
-        File dir = new File("data/" + DIRECTORY);
+        File dir = new File("data/" + FILEPATH);
         File[] directoryListing = dir.listFiles();
         int recentyear = -1;
         if (directoryListing != null) {
@@ -145,7 +134,7 @@ public class Main {
     public List<String> getMostPopularInRange(String gender, int startyear, int finalyear) throws FileNotFoundException {
         Map<String, Integer> years = new HashMap<>();
         for (int year = startyear; year <= finalyear; year++) {
-            Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
+            Scanner scanner = new Scanner(new File("data/" + FILEPATH + "/yob" + year + ".txt"));
             while (scanner.hasNextLine()) {
                 String[] nameArray = scanner.nextLine().split(",");
                 if (nameArray[1].equals(gender)) {
@@ -174,7 +163,7 @@ public class Main {
         Map<String, Integer> popular = new HashMap<>();
         Map<String, SortedSet<String>> listNames = new HashMap<>();
         for (int year = startyear; year <= finalyear; year++) {
-            Scanner scanner = new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
+            Scanner scanner = new Scanner(new File("data/" + FILEPATH + "/yob" + year + ".txt"));
             while (scanner.hasNextLine()) {
                 String[] nameArray = scanner.nextLine().split(",");
                 if (nameArray[1].equals(FEMALE)) {
@@ -211,12 +200,25 @@ public class Main {
     }
 
     private ArrayList<String[]> parseFile(int year) throws FileNotFoundException {
-        Scanner scan = new Scanner(new File(DIRECTORY + year + FILETYPE));
+        Scanner scan = new Scanner(new File(FILEPATH + year + FILETYPE));
         ArrayList<String[]> data = new ArrayList<>();
         while (scan.hasNextLine()) {
             data.add(scan.nextLine().split(","));
         }
         return data;
+    }
+
+    private File[] getListOfFiles() {
+        File dir = new File(DIRECTORY);
+        if (dir == null) {
+            return new File[0];
+        }
+        return dir.listFiles();
+    }
+
+    private int getYearFromFileName(File file) {
+        String yearString = file.getName().replaceAll("[^0-9]","");
+        return Integer.parseInt(yearString);
     }
 
     public static void main (String[] args) throws FileNotFoundException {
