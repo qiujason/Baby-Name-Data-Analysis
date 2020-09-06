@@ -46,22 +46,16 @@ public class Main {
         Map<Integer, Integer> rankings = new HashMap<>();
         for (File file : getListOfFiles()) {
             int year = getYearFromFileName(file);
-
-
-            boolean found = false;
-            int rank = 1;
             List<String[]> data = parseFile(year);
-            for (String[] nameArray : data) {
-                if (nameArray[1].equals(gender)) {
-                    if (nameArray[0].equals(name)) {
-                        rankings.put(year, rank);
-                        found = true;
-                        break;
-                    }
-                    rank++;
+            Map<Integer, String> rankTable = getRankTable(data, gender);
+            boolean found = false;
+            for (int rank : rankTable.keySet()) {
+                if (rankTable.get(rank).equals(name)) {
+                    rankings.put(year, rank);
+                    found = true;
+                    break;
                 }
             }
-            // name not found
             if (!found) {
                 rankings.put(year, -1);
             }
@@ -73,18 +67,29 @@ public class Main {
     }
 
     public String getSameRank(String name, String gender, int year) throws FileNotFoundException {
-        int rank = 0;
-        boolean found = false;
-        ArrayList<String[]> data = new ArrayList<>();
-        for (String[] nameArray : data) {
-            if (nameArray[1].equals(gender)) {
-                rank++;
-                if (nameArray[0].equals(name)) {
-                    found = true;
-                    break;
-                }
+        List<String[]> data = parseFile(year);
+        Map<Integer, String> rankTable = getRankTable(data, gender);
+        int nameRank = -1;
+        for (int rank : rankTable.keySet()) {
+            if (rankTable.get(rank).equals(name)) {
+                nameRank = rank;
+                break;
             }
         }
+        if (nameRank == -1) {
+            return "Name not found";
+        }
+//        boolean found = false;
+//        ArrayList<String[]> data = new ArrayList<>();
+//        for (String[] nameArray : data) {
+//            if (nameArray[1].equals(gender)) {
+//                rank++;
+//                if (nameArray[0].equals(name)) {
+//                    found = true;
+//                    break;
+//                }
+//            }
+//        }
 //        while (scanner.hasNextLine()) {
 //            String[] nameArray = scanner.nextLine().split(",");
 //            if (nameArray[1].equals(gender)) {
