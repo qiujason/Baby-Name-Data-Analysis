@@ -15,11 +15,6 @@ public class Main {
     // CONFIGURATION
     private static final String DIRECTORY = "ssa_complete/yob";
     private static final String FILETYPE = ".txt";
-
-    // put under public methods
-    private Scanner parseFile(int year) throws FileNotFoundException {
-        return new Scanner(new File("data/" + DIRECTORY + "/yob" + year + ".txt"));
-    }
     
     // TODO: add what it takes in, returns, example (javadoc)
     public String[] getTopRankedYear(int year) throws FileNotFoundException {
@@ -207,6 +202,15 @@ public class Main {
             i++;
         }
         return results;
+    }
+
+    private ArrayList<String[]> parseFile(int year) throws FileNotFoundException {
+        Scanner scan = new Scanner(new File(DIRECTORY + year + FILETYPE));
+        ArrayList<String[]> data = new ArrayList<>();
+        while (scan.hasNextLine()) {
+            data.add(scan.nextLine().split(","));
+        }
+        return data;
     }
 
     public static void main (String[] args) throws FileNotFoundException {
