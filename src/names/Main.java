@@ -14,13 +14,14 @@ public class Main {
     private static final String MALE = "M";
     private static final int TOPRANK = 1;
     //TODO: global variables for namearray indices
+    //TODO: make parsefile class. i can create a parsefile object that reads the data
     
     // TODO: add what it takes in, returns, example (javadoc)
     //TODO: clarify in javadocs comment what a line would look like
-    public String[] getTopRankedInYear(int year) {
+    public String[] findTopRankedInYear(int year) {
         String[] topRanked = new String[2];
-        Map<Integer,String> maleRankTable = getRankTable(year, MALE);
-        Map<Integer,String> femaleRankTable = getRankTable(year, FEMALE);
+        Map<Integer, String> maleRankTable = getRankTable(year, MALE);
+        Map<Integer, String> femaleRankTable = getRankTable(year, FEMALE);
         topRanked[0] = maleRankTable.get(TOPRANK);
         topRanked[1] = femaleRankTable.get(TOPRANK);
         System.out.println(topRanked[0]);
@@ -28,7 +29,7 @@ public class Main {
         return topRanked;
     }
 
-    public int[] getCountByGenderLetterYear(int year, String gender, String letter) {
+    public int[] findCountByGenderLetterYear(int year, String gender, String letter) {
         int[] counts = new int[2];
         List<String[]> data = parseFile(year);
         data.stream()
@@ -42,13 +43,13 @@ public class Main {
         return counts;
     }
 
-    public Map<Integer,Integer> getRankingsByNameGender(String name, String gender) {
+    public Map<Integer,Integer> findRankingsByNameGender(String name, String gender) {
         int startYear = getOldestYear();
         int finalYear = getRecentYear();
-        return getRankingsByNameGenderInRange(startYear, finalYear, name, gender);
+        return findRankingsByNameGenderInRange(startYear, finalYear, name, gender);
     }
 
-    public String getSameRankInRecentYear(String name, String gender, int year) {
+    public String findSameRankInRecentYear(String name, String gender, int year) {
         Map<Integer, String> rankTable = getRankTable(year, gender);
         int nameRank = -1;
         for (int rank : rankTable.keySet()) {
@@ -73,7 +74,7 @@ public class Main {
         }
     }
 
-    public List<String> getMostPopularInRange(String gender, int startYear, int finalYear) {
+    public List<String> findMostPopularInRange(String gender, int startYear, int finalYear) {
         Map<String, Integer> topRankPerYear = new HashMap<>();
         for (int year = startYear; year <= finalYear; year++) {
             Map<Integer, String> rankTable = getRankTable(year, gender);
@@ -90,7 +91,7 @@ public class Main {
         return results;
     }
 
-    public String[] getMostPopularLetterGirls(int startYear, int finalYear) {
+    public String[] findMostPopularLetterGirls(int startYear, int finalYear) {
         Integer[] charCounts = new Integer[100];
         Arrays.fill(charCounts, 0);
         Map<Character, SortedSet<String>> listNamesOfChar = new HashMap<>();
@@ -114,8 +115,7 @@ public class Main {
         return results;
     }
 
-    public Map<Integer,Integer> getRankingsByNameGenderInRange(int startYear, int finalYear,
-                                                               String name, String gender) {
+    public Map<Integer, Integer> findRankingsByNameGenderInRange(int startYear, int finalYear, String name, String gender) {
         Map<Integer, Integer> rankings = new HashMap<>();
         for (int year = startYear; year <= finalYear; year++) {
             int currentYear = year; // necessary for lambda expression below
@@ -127,13 +127,19 @@ public class Main {
             });
             rankings.putIfAbsent(year, -1);
         }
-        for (int year : rankings.keySet()) {
-            System.out.println(year + " - " + rankings.get(year));
-        }
         return rankings;
     }
 
-//    public int[]
+    public Map<String, Integer> findRankingDifferenceFirstLastYears(int startYear, int finalYear, String name, String gender) {
+        Map<Integer, Integer> rankings = findRankingsByNameGenderInRange(startYear, finalYear, name, gender);
+        Map<String, Integer> results = new HashMap<>();
+        int firstRanking = rankings.get(startYear);
+        int lastRanking = rankings.get(finalYear);
+        results.put(Integer.toString(startYear), firstRanking);
+        results.put(Integer.toString(finalYear), lastRanking);
+        results.put("Difference (rankings up)", firstRanking-lastRanking);
+        return results;
+    }
 
     private List<String[]> parseFile(int year) {
         String filepath = DIRECTORY + "yob" + year + ".txt";
@@ -199,7 +205,7 @@ public class Main {
 
     private int getOldestYear() {
         File[] directoryListing = getListOfFiles();
-        int recentYear = 10000; // number impossible to be a year
+        int recentYear = 10000; // large number impossible to be a year
         for (File file : directoryListing) {
             recentYear = Math.min(recentYear, getYearFromFileName(file));
         }
@@ -210,24 +216,39 @@ public class Main {
         Main main = new Main();
 
         System.out.println("Test Implementation #1");
-        String[] topRanked = main.getTopRankedInYear(1900);
+        String[] topRanked = main.findTopRankedInYear(1900);
 
         System.out.println("\nTest Implementation #2");
-        int[] counts = main.getCountByGenderLetterYear(1900, "M", "Q");
+        int[] counts = main.findCountByGenderLetterYear(1900, "M", "Q");
 
         System.out.println("\nBasic Implementation #1");
-        Map<Integer, Integer> rankings = main.getRankingsByNameGender("Jason", "M");
+        Map<Integer, Integer> rankings = main.findRankingsByNameGender("Jason", "M");
+        rankings.forEach((year, ranking) -> System.out.println(year + " - " + ranking));
 
         System.out.println("\nBasic Implementation #2");
-        String name = main.getSameRankInRecentYear("Jason", "M", 1900);
+        String name = main.findSameRankInRecentYear("Jason", "M", 1900);
 
         System.out.println("\nBasic Implementation #3");
-        List<String> result1 = main.getMostPopularInRange("M", 2000, 2009);
+        List<String> result1 = main.findMostPopularInRange("M", 2000, 2009);
 
         System.out.println("\nBasic Implementation #4");
-        String[] result2 = main.getMostPopularLetterGirls(1880, 2018);
+        String[] result2 = main.findMostPopularLetterGirls(1880, 2018);
 
-        System.out.println("\nComplete Implementation #1");
-        Map<Integer, Integer> rankingsInRange = main.getRankingsByNameGenderInRange(1900, 2000, "Jason", "M");
+        System.out.println("\n\nComplete Implementation #1");
+        Map<Integer, Integer> rankingsInRange = main.findRankingsByNameGenderInRange(1900, 2000, "Jason", "M");
+        rankingsInRange.forEach((year, ranking) -> System.out.println(year + " - " + ranking));
+
+        System.out.println("\nComplete Implementation #2");
+        Map<String, Integer> rankingDifferences = main.findRankingDifferenceFirstLastYears(1900, 2000, "Jason", "M");
+        rankingDifferences.forEach((k, ranking) -> System.out.println(k + ": " + ranking));
+
+        System.out.println("\nComplete Implementation #3");
+        System.out.println("\nComplete Implementation #4");
+        System.out.println("\nComplete Implementation #5");
+        System.out.println("\nComplete Implementation #6");
+        System.out.println("\nComplete Implementation #7");
+        System.out.println("\nComplete Implementation #8");
+        System.out.println("\nComplete Implementation #9");
+        System.out.println("\nComplete Implementation #10");
     }
 }
