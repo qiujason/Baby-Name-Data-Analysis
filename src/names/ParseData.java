@@ -5,13 +5,13 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class ParseData {
-    private static final int NAMEINDEX = 0;
-    private static final int GENDERINDEX = 1;
+    private static final int NAME_INDEX = 0;
+    private static final int GENDER_INDEX = 1;
 
-    private String directory;
-    private int startYear;
-    private int finalYear;
-    private Map<Integer, List<String[]>> data;
+    private final String directory;
+    private final int startYear;
+    private final int finalYear;
+    private final Map<Integer, List<String[]>> data;
 
     public ParseData(String directory) {
         this.directory = directory;
@@ -27,8 +27,8 @@ public class ParseData {
         int rank = 1;
         Map<Integer, String> rankTable = new HashMap<>();
         for (String[] nameArray : data.get(year)) {
-            if (nameArray[GENDERINDEX].equals(gender)) {
-                rankTable.put(rank, nameArray[NAMEINDEX]);
+            if (nameArray[GENDER_INDEX].equals(gender)) {
+                rankTable.put(rank, nameArray[NAME_INDEX]);
                 rank++;
             }
         }
@@ -39,8 +39,8 @@ public class ParseData {
         int rank = 1;
         Map<String, Integer> rankTableInverse = new HashMap<>();
         for (String[] nameArray : data.get(year)) {
-            if (nameArray[GENDERINDEX].equals(gender)) {
-                rankTableInverse.put(nameArray[NAMEINDEX], rank);
+            if (nameArray[GENDER_INDEX].equals(gender)) {
+                rankTableInverse.put(nameArray[NAME_INDEX], rank);
                 rank++;
             }
         }
@@ -64,11 +64,16 @@ public class ParseData {
         List<String[]> data = new ArrayList<>();
         try {
             Scanner scan = new Scanner(new File(filepath));
+            if (!scan.hasNextLine()) {
+                throw new Exception(filepath + " has no data. Please remove.");
+            }
             while (scan.hasNextLine()) {
                 data.add(scan.nextLine().split(","));
             }
         } catch (FileNotFoundException e) {
             System.out.println(filepath + " not found");
+        } catch (Exception e) {
+            System.out.println(e);
         }
         return data;
     }
