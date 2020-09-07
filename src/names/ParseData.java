@@ -1,7 +1,7 @@
 package names;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.net.URL;
 import java.util.*;
 
 public class ParseData {
@@ -13,13 +13,24 @@ public class ParseData {
     private final int finalYear;
     private final Map<Integer, List<String[]>> data;
 
+    //TODO: NOTE THAT THE URL HAS TO BEGIN WITH HTTPS://
     public ParseData(String directory) {
         this.directory = directory;
-        this.startYear = DataUtils.getOldestYear(directory);
-        this.finalYear = DataUtils.getRecentYear(directory);
         this.data = new HashMap<>();
+        if (directory.contains("https://")) {
+            handleURL();
+            this.startYear = Collections.min(data.keySet());
+            this.finalYear = Collections.max(data.keySet());
+        } else {
+            this.startYear = DataUtils.getOldestYear(directory);
+            this.finalYear = DataUtils.getRecentYear(directory);
+        }
         for (int year = startYear; year <= finalYear; year++) {
-            data.put(year, parseFile(year));
+            try {
+                data.put(year, parseFile(year));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -59,22 +70,43 @@ public class ParseData {
         return finalYear;
     }
 
-    private List<String[]> parseFile(int year) {
-        String filepath = directory + "yob" + year + ".txt";
-        List<String[]> data = new ArrayList<>();
+    private void handleURL() {
         try {
-            Scanner scan = new Scanner(new File(filepath));
+            URL dataURL = new URL(directory);
+            BufferedReader in = new BufferedReader(new InputStreamReader(dataURL.openStream()));
+            in.lines().filter(line -> line.contains("href") && line.contains(".txt"))
+                    .map(line -> {
+                        int startIndex = line.indexOf("href=\"") + "href\"".length() + 1;
+                        return line.substring(startIndex, line.indexOf("\"", startIndex));
+                    })
+                    .forEach(fileName -> {
+                        int year = DataUtils.getYearFromFileName(new File(fileName));
+                        data.put(year, null);
+                    });
+            in.close();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Bad URL: " + directory);
+        }
+    }
+
+    private List<String[]> parseFile(int year) throws IOException {
+        String filePath = directory + "yob" + year + ".txt";
+        URL url = new URL(filePath);
+        if (!directory.contains("https://")) {
+            url = new File(filePath).toURI().toURL();
+        }
+        List<String[]> dataForYear = new ArrayList<>();
+        try {
+            Scanner scan = new Scanner(url.openStream());
             if (!scan.hasNextLine()) {
-                throw new Exception(filepath + " has no data. Please remove.");
+                throw new IllegalArgumentException(filePath + " has no data. Please remove.");
             }
             while (scan.hasNextLine()) {
-                data.add(scan.nextLine().split(","));
+                dataForYear.add(scan.nextLine().split(","));
             }
         } catch (FileNotFoundException e) {
-            System.out.println(filepath + " not found");
-        } catch (Exception e) {
-            System.out.println(e);
+            System.out.println(filePath + " not found");
         }
-        return data;
+        return dataForYear;
     }
 }
