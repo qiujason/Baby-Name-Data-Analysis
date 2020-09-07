@@ -10,8 +10,11 @@ import java.util.stream.Collectors;
 public class Main {
     // CONFIGURATION
     private static final String DIRECTORY = "data/ssa_complete/";
-    private static final String FEMALE = "F";
     private static final String MALE = "M";
+    private static final String FEMALE = "F";
+    private static final int NAMEINDEX = 0;
+    private static final int GENDERINDEX = 1;
+    private static final int FREQINDEX = 2;
     private static final int TOPRANK = 1;
     //TODO: global variables for namearray indices
     //TODO: make parsefile class. i can create a parsefile object that reads the data
@@ -31,13 +34,11 @@ public class Main {
         int[] counts = new int[2];
         List<String[]> data = parseFile(year);
         data.stream()
-                .filter(nameArray -> nameArray[0].startsWith(letter) && nameArray[1].equals(gender))
+                .filter(nameArray -> nameArray[NAMEINDEX].startsWith(letter) && nameArray[GENDERINDEX].equals(gender))
                 .forEach(nameArray -> {
                     counts[0]++;
-                    counts[1] += Integer.parseInt(nameArray[2]);
+                    counts[1] += Integer.parseInt(nameArray[FREQINDEX]);
                 });
-        System.out.println(counts[0] + " different names");
-        System.out.println(counts[1] + " total babies");
         return counts;
     }
 
@@ -57,15 +58,12 @@ public class Main {
             }
         }
         if (nameRank == -1) {
-            System.out.println("Name not found");
             return "Name not found";
         }
         int recentYear = getRecentYear();
         if (recentYear != -1) {
             Map<Integer, String> recentYearRankTable = getRankTable(recentYear, gender);
-            String matchedName = recentYearRankTable.get(nameRank);
-            System.out.println(matchedName);
-            return matchedName;
+            return recentYearRankTable.get(nameRank);
         } else {
             return "No files found";
         }
@@ -80,12 +78,10 @@ public class Main {
             topRankPerYear.put(topRankedName, topRankPerYear.get(topRankedName) + 1);
         }
         int mostFrequent = Collections.max(topRankPerYear.values());
-        List<String> results = topRankPerYear.entrySet().stream()
+        return topRankPerYear.entrySet().stream()
                 .filter(entry -> entry.getValue() == mostFrequent)
                 .map(entry -> entry.getKey() + " for " + entry.getValue() + " years")
                 .collect(Collectors.toList());
-        results.forEach(System.out::println);
-        return results;
     }
 
     public String[] findMostPopularLetterGirls(int startYear, int finalYear) {
@@ -102,11 +98,9 @@ public class Main {
         SortedSet<String> listOfNames = listNamesOfChar.get(mostPopularLetter);
         String[] results = new String[listOfNames.size() + 1];
         results[0] = Character.toString(mostPopularLetter);
-        System.out.println("Most Popular Letter for Females: " + mostPopularLetter);
         int i = 1;
         for (String name : listOfNames) {
             results[i] = name;
-            System.out.print(name + ", ");
             i++;
         }
         return results;
@@ -226,8 +220,8 @@ public class Main {
         int rank = 1;
         Map<Integer, String> rankTable = new HashMap<>();
         for (String[] nameArray : data) {
-            if (nameArray[1].equals(gender)) {
-                rankTable.put(rank, nameArray[0]);
+            if (nameArray[GENDERINDEX].equals(gender)) {
+                rankTable.put(rank, nameArray[NAMEINDEX]);
                 rank++;
             }
         }
@@ -240,8 +234,8 @@ public class Main {
         int rank = 1;
         Map<String, Integer> rankTableInverse = new HashMap<>();
         for (String[] nameArray : data) {
-            if (nameArray[1].equals(gender)) {
-                rankTableInverse.put(nameArray[0], rank);
+            if (nameArray[GENDERINDEX].equals(gender)) {
+                rankTableInverse.put(nameArray[NAMEINDEX], rank);
                 rank++;
             }
         }
@@ -251,13 +245,13 @@ public class Main {
     private void fillCountsAndNamesOfFirstLetters(int year, String gender, Integer[] charCounts,
                                           Map<Character, SortedSet<String>> listNamesOfChar) {
         List<String[]> data = parseFile(year).stream()
-                .filter(nameArray -> nameArray[1].equals(gender))
+                .filter(nameArray -> nameArray[GENDERINDEX].equals(gender))
                 .collect(Collectors.toList());
         data.forEach(nameArray -> {
-            char letter = nameArray[0].charAt(0);
+            char letter = nameArray[NAMEINDEX].charAt(0);
             charCounts[letter]++;
             listNamesOfChar.putIfAbsent(letter, new TreeSet<>());
-            listNamesOfChar.get(letter).add(nameArray[0]);
+            listNamesOfChar.get(letter).add(nameArray[NAMEINDEX]);
         });
     }
 
@@ -303,6 +297,8 @@ public class Main {
 
         System.out.println("\nTest Implementation #2");
         int[] counts = main.findCountByGenderLetterYear(1900, "M", "Q");
+        System.out.println(counts[0] + " different names");
+        System.out.println(counts[1] + " total babies");
 
         System.out.println("\nBasic Implementation #1");
         Map<Integer, Integer> rankings = main.findRankingsByNameGender("Jason", "M");
@@ -312,10 +308,15 @@ public class Main {
         System.out.println(main.findSameRankInRecentYear("Jason", "M", 1900));
 
         System.out.println("\nBasic Implementation #3");
-        List<String> result1 = main.findMostPopularInRange("M", 2000, 2009);
+        List<String> mostPopular = main.findMostPopularInRange("M", 2000, 2009);
+        mostPopular.forEach(System.out::println);
 
         System.out.println("\nBasic Implementation #4");
-        String[] result2 = main.findMostPopularLetterGirls(1880, 2018);
+        String[] mostPopularLetterNames = main.findMostPopularLetterGirls(1880, 2018);
+        System.out.println("Most Popular Letter for Females: " + mostPopularLetterNames[0]);
+        for (String name : mostPopularLetterNames) {
+            System.out.print(name + ", ");
+        }
 
         System.out.println("\n\nComplete Implementation #1");
         Map<Integer, Integer> rankingsInRange = main.findRankingsByNameGenderInRange(1900, 2000, "Jason", "M");
