@@ -24,8 +24,6 @@ public class Main {
         Map<Integer, String> femaleRankTable = getRankTable(year, FEMALE);
         topRanked[0] = maleRankTable.get(TOPRANK);
         topRanked[1] = femaleRankTable.get(TOPRANK);
-        System.out.println(topRanked[0]);
-        System.out.println(topRanked[1]);
         return topRanked;
     }
 
@@ -62,7 +60,6 @@ public class Main {
             System.out.println("Name not found");
             return "Name not found";
         }
-
         int recentYear = getRecentYear();
         if (recentYear != -1) {
             Map<Integer, String> recentYearRankTable = getRankTable(recentYear, gender);
@@ -122,7 +119,7 @@ public class Main {
             Map<String, Integer> rankTableInverse = getRankTableInverse(year, gender);
             try {
                 rankings.put(year, rankTableInverse.get(name));
-            } catch(NullPointerException e) {
+            } catch (NullPointerException e) {
                 rankings.put(year, null);
             }
         }
@@ -187,6 +184,27 @@ public class Main {
     public int findAverageRankRecentYears(String name, String gender, int numYears) {
         int recentYear = getRecentYear();
         return findAverageRankOverRange(recentYear - numYears + 1, recentYear, name, gender);
+    }
+
+    public Map<Integer, String> findNamesAtRank(int startYear, int finalYear, String gender, int rank) {
+        Map<Integer, String> namesAtRank = new HashMap<>();
+        for (int year = startYear; year <= finalYear; year++) {
+            Map<Integer, String> rankTable = getRankTable(year, gender);
+            namesAtRank.put(year, rankTable.get(rank));
+        }
+        return namesAtRank;
+    }
+
+    public Map<String, Integer> findNamesAtRankMostOften(int startYear, int finalYear, String gender, int rank) {
+        Map<String, Integer> allFrequencies = new HashMap<>();
+        Map<Integer, String> namesAtRank = findNamesAtRank(startYear, finalYear, gender, rank);
+        namesAtRank.values().forEach(name -> allFrequencies.put(name, allFrequencies.getOrDefault(name, 0) + 1));
+        Map<String, Integer> mostFrequent = new HashMap<>();
+        int maxFrequency = Collections.max(allFrequencies.values());
+        allFrequencies.entrySet().stream()
+                .filter(entry -> entry.getValue() == maxFrequency)
+                .forEach(entry -> mostFrequent.put(entry.getKey(), entry.getValue()));
+        return mostFrequent;
     }
 
     private List<String[]> parseFile(int year) {
@@ -279,6 +297,9 @@ public class Main {
 
         System.out.println("Test Implementation #1");
         String[] topRanked = main.findTopRankedInYear(1900);
+        for (String name : topRanked) {
+            System.out.println(name);
+        }
 
         System.out.println("\nTest Implementation #2");
         int[] counts = main.findCountByGenderLetterYear(1900, "M", "Q");
@@ -288,7 +309,7 @@ public class Main {
         rankings.forEach((year, ranking) -> System.out.println(year + " - " + ranking));
 
         System.out.println("\nBasic Implementation #2");
-        String name = main.findSameRankInRecentYear("Jason", "M", 1900);
+        System.out.println(main.findSameRankInRecentYear("Jason", "M", 1900));
 
         System.out.println("\nBasic Implementation #3");
         List<String> result1 = main.findMostPopularInRange("M", 2000, 2009);
@@ -309,20 +330,24 @@ public class Main {
         }
 
         System.out.println("\nComplete Implementation #3");
-        System.out.println(main.findNameLargestDifferenceFirstLastYears(1900, 2000, MALE));
+//        System.out.println(main.findNameLargestDifferenceFirstLastYears(1900, 2000, MALE));
 
         System.out.println("\nComplete Implementation #4");
         System.out.println(main.findAverageRankOverRange(2014, 2018, "Jason", MALE));
 
         System.out.println("\nComplete Implementation #5");
-        System.out.println(main.findNameHighestAverageRank(1971, 1973, FEMALE));
+//        System.out.println(main.findNameHighestAverageRank(1971, 1973, FEMALE));
         
         System.out.println("\nComplete Implementation #6");
         System.out.println(main.findAverageRankRecentYears("Jason", MALE, 5));
 
         System.out.println("\nComplete Implementation #7");
+        Map<Integer, String> namesAtRank = main.findNamesAtRank(2000, 2018, MALE, 1);
+        namesAtRank.forEach((year, name) -> System.out.println(year + " - " + name));
+
         System.out.println("\nComplete Implementation #8");
-        System.out.println("\nComplete Implementation #9");
-        System.out.println("\nComplete Implementation #10");
+        Map<String, Integer> mostFrequent = main.findNamesAtRankMostOften(2000, 2018, MALE, 1);
+        mostFrequent.forEach((name, frequency) -> System.out.println(name + ": " + frequency));
+
     }
 }
