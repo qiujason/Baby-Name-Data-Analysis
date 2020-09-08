@@ -14,9 +14,6 @@ public class Main {
 
     private static final String MALE = "M";
     private static final String FEMALE = "F";
-    
-    //TODO: add what it takes in, returns, example (javadoc)
-    //TODO: clarify in javadocs comment what a line would look like
 
     public static void main (String[] args) {
         DataAnalysis analysis = new DataAnalysis(DIRECTORY);
