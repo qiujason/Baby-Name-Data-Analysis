@@ -316,17 +316,6 @@ class MainTest {
     }
 
     @Test
-    void testDifferentCaseName() {
-        Map<Integer, Integer> expected = new HashMap<>();
-        expected.put(2020, 3);
-        expected.put(2021, 0);
-        expected.put(2022, 2);
-        expected.put(2023, 3);
-        expected.put(2024, 4);
-        assertEquals(expected, testInstance.findRankingsByNameGender("wILLiAm", "M"));
-    }
-
-    @Test
     void testBadGenderInput() {
         Exception exception = assertThrows(Exception.class,
                 () -> testInstance.findSameRankInRecentYear("Sophia", "G", 2020));
