@@ -5,13 +5,15 @@ import java.util.*;
 
 
 public class Main {
-    // CONFIGURATION
+    /*
+    CONFIGURATION
+     */
     private static final String DIRECTORY = "data/ssa_complete/";
+//    private static final String DIRECTORY = "data/ssa_2000s/";
+//    private static final String DIRECTORY = "https://www2.cs.duke.edu/courses/fall20/compsci307d/assign/01_data/data/ssa_complete/";
 
     private static final String MALE = "M";
     private static final String FEMALE = "F";
-    //TODO: global variables for namearray indices
-    //TODO: make parsefile class. i can create a parsefile object that reads the data
     
     //TODO: add what it takes in, returns, example (javadoc)
     //TODO: clarify in javadocs comment what a line would look like
@@ -20,7 +22,7 @@ public class Main {
         DataAnalysis analysis = new DataAnalysis(DIRECTORY);
 
         System.out.println("Test Implementation #1");
-        String[] topRanked = analysis.findTopRankedInYear(1950);
+        String[] topRanked = analysis.findTopRankedInYear(1880);
         for (String name : topRanked) {
             System.out.println(name);
         }
@@ -38,7 +40,7 @@ public class Main {
         System.out.println(analysis.findSameRankInRecentYear("Frank", MALE, 1880));
 
         System.out.println("\nBasic Implementation #3");
-        List<String> mostPopular = analysis.findMostPopularInRange(MALE, 1930, 1940);
+        List<String> mostPopular = analysis.findMostPopularInRange(MALE, 1900, 1940);
         mostPopular.forEach(System.out::println);
 
         System.out.println("\nBasic Implementation #4");
