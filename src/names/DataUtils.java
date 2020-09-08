@@ -51,4 +51,24 @@ public class DataUtils {
         }
         return recentYear;
     }
+    /*
+    ranges of years that are empty, do not fit completely within the years in the given source of data, or are otherwise nonsensical
+names that do not match the exact case of those in the various data files
+genders that are not either M or F (the only ones given in the data files)
+     */
+
+    public static void handleYearErrors(ParseData data, int year) {
+        handleYearErrors(data, year, year);
+    }
+
+    public static void handleYearErrors(ParseData data, int startYear, int finalYear) {
+        if (startYear > finalYear) {
+            throw new IllegalArgumentException("First year in range is after last year in range");
+        }
+        for (int year = startYear; year <= finalYear; year++) {
+            if (data.getDataFromYear(year) == null) {
+                throw new IllegalArgumentException(year + " is not a valid year or is not in the dataset");
+            }
+        }
+    }
 }
