@@ -17,6 +17,11 @@ public class DataAnalysis {
         data = new ParseData(directory);
     }
 
+    /**
+     *
+     * @param year
+     * @return
+     */
     public String[] findTopRankedInYear(int year) {
         DataUtils.handleYearErrors(data, year);
         String[] topRanked = new String[2];
@@ -42,14 +47,14 @@ public class DataAnalysis {
 
     public Map<Integer,Integer> findRankingsByNameGender(String name, String gender) {
         DataUtils.handleGenderErrors(gender);
-        DataUtils.handleNameConvention(name);
+        name = DataUtils.handleNameConvention(name);
         return findRankingsByNameGenderInRange(data.getStartYear(), data.getFinalYear(), name, gender);
     }
 
     public String findSameRankInRecentYear(String name, String gender, int year) {
         DataUtils.handleYearErrors(data, year);
         DataUtils.handleGenderErrors(gender);
-        DataUtils.handleNameConvention(name);
+        name = DataUtils.handleNameConvention(name);
         Map<String, Integer> rankTableInverse = data.getRankTableInverse(year, gender);
         Integer nameRank = rankTableInverse.get(name);
         if (nameRank == null) {
@@ -112,7 +117,7 @@ public class DataAnalysis {
     public Map<Integer, Integer> findRankingsByNameGenderInRange(int startYear, int finalYear, String name, String gender) {
         DataUtils.handleYearErrors(data, startYear, finalYear);
         DataUtils.handleGenderErrors(gender);
-        DataUtils.handleNameConvention(name);
+        name = DataUtils.handleNameConvention(name);
         Map<Integer, Integer> rankings = new HashMap<>();
         for (int year = startYear; year <= finalYear; year++) {
             Map<String, Integer> rankTableInverse = data.getRankTableInverse(year, gender);
@@ -129,7 +134,7 @@ public class DataAnalysis {
     public Map<String, Integer> findRankingDifferenceFirstLastYears(int startYear, int finalYear, String name, String gender) {
         DataUtils.handleYearErrors(data, startYear, finalYear);
         DataUtils.handleGenderErrors(gender);
-        DataUtils.handleNameConvention(name);
+        name = DataUtils.handleNameConvention(name);
         Map<Integer, Integer> rankingStartYear = findRankingsByNameGenderInRange(startYear, startYear, name, gender);
         Map<Integer, Integer> rankingFinalYear = findRankingsByNameGenderInRange(finalYear, finalYear, name, gender);
         Map<String, Integer> results = new HashMap<>();
@@ -164,7 +169,7 @@ public class DataAnalysis {
     public int findAverageRankOverRange(int startYear, int finalYear, String name, String gender) {
         DataUtils.handleYearErrors(data, startYear, finalYear);
         DataUtils.handleGenderErrors(gender);
-        DataUtils.handleNameConvention(name);
+        name = DataUtils.handleNameConvention(name);
         Map<Integer, Integer> rankings = findRankingsByNameGenderInRange(startYear, finalYear, name, gender);
         int sum = rankings.values().stream().reduce(0, (total, rank) -> {
             if (rank == null) {
@@ -190,7 +195,7 @@ public class DataAnalysis {
 
     public int findAverageRankRecentYears(String name, String gender, int numYears) {
         DataUtils.handleGenderErrors(gender);
-        DataUtils.handleNameConvention(name);
+        name = DataUtils.handleNameConvention(name);
         int recentYear = data.getFinalYear();
         return findAverageRankOverRange(recentYear - numYears + 1, recentYear, name, gender);
     }
