@@ -2,7 +2,6 @@ package names;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class DataAnalysis {
     private static final String MALE = "M";
@@ -76,7 +75,6 @@ public class DataAnalysis {
                 .collect(Collectors.toList());
     }
 
-    //TODO: handle ties
     public String[] findMostPopularLetterGirls(int startYear, int finalYear) {
         DataUtils.handleYearErrors(data, startYear, finalYear);
         Integer[] charCounts = new Integer[100];
@@ -125,16 +123,13 @@ public class DataAnalysis {
         Map<Integer, Integer> rankingStartYear = findRankingsByNameGenderInRange(startYear, startYear, name, gender);
         Map<Integer, Integer> rankingFinalYear = findRankingsByNameGenderInRange(finalYear, finalYear, name, gender);
         Map<String, Integer> results = new HashMap<>();
-        try {
-            int firstRanking = rankingStartYear.get(startYear);
-            int lastRanking = rankingFinalYear.get(finalYear);
-            results.put(Integer.toString(startYear), firstRanking);
-            results.put(Integer.toString(finalYear), lastRanking);
-            results.put("Difference", firstRanking - lastRanking);
-            return results;
-        } catch (NullPointerException e) {
-            return null;
-        }
+        int firstRanking = rankingStartYear.get(startYear);
+        int lastRanking = rankingFinalYear.get(finalYear);
+        if (firstRanking == 0 || lastRanking == 0) return null; // name not found
+        results.put(Integer.toString(startYear), firstRanking);
+        results.put(Integer.toString(finalYear), lastRanking);
+        results.put("Difference", firstRanking - lastRanking);
+        return results;
     }
 
     public String findNameLargestDifferenceFirstLastYears(int startYear, int finalYear, String gender) {
@@ -188,7 +183,11 @@ public class DataAnalysis {
         Map<Integer, String> namesAtRank = new HashMap<>();
         for (int year = startYear; year <= finalYear; year++) {
             Map<Integer, String> rankTable = data.getRankTable(year, gender);
-            namesAtRank.put(year, rankTable.get(rank));
+            String name = rankTable.get(rank);
+            if (name == null) {
+                name = "Invalid rank";
+            }
+            namesAtRank.put(year, name);
         }
         return namesAtRank;
     }
