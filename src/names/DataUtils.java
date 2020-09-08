@@ -85,4 +85,17 @@ genders that are not either M or F (the only ones given in the data files)
             }
         }
     }
+
+    public static String handleNameConvention(String name) {
+        if (name.equals("")) {
+            throw new IllegalArgumentException("Invalid Name");
+        }
+        return name.substring(0,1).toUpperCase() + name.substring(1).toLowerCase();
+    }
+
+    public static void handleGenderErrors(String gender) {
+        if (!gender.equals("M") && !gender.equals("F")) {
+            throw new IllegalArgumentException("Invalid Gender");
+        }
+    }
 }
