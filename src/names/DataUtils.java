@@ -10,15 +10,29 @@ public class DataUtils {
 
     public static void fillCountsAndNamesOfFirstLetters(List<String[]> data, Integer[] charCounts,
                                                   Map<Character, SortedSet<String>> listNamesOfChar, String gender) {
-        data.stream()
+        data = data.stream()
                 .filter(nameArray -> nameArray[GENDERINDEX].equals(gender))
-                .collect(Collectors.toList())
-                .forEach(nameArray -> {
-                    char letter = nameArray[NAMEINDEX].charAt(0);
-                    charCounts[letter]++;
-                    listNamesOfChar.putIfAbsent(letter, new TreeSet<>());
-                    listNamesOfChar.get(letter).add(nameArray[NAMEINDEX]);
-                });
+                .collect(Collectors.toList());
+        String[] topNameArray = data.get(0);
+        char letter = topNameArray[NAMEINDEX].charAt(0);
+        charCounts[letter]++;
+        data.forEach(nameArray -> {
+            char firstLetter = nameArray[NAMEINDEX].charAt(0);
+            listNamesOfChar.putIfAbsent(firstLetter, new TreeSet<>());
+            listNamesOfChar.get(firstLetter).add(nameArray[NAMEINDEX]);
+        });
+    }
+
+    public static List<Character> getMostFrequentNamesWithFirstLetter(Integer[] charCounts) {
+        List<Integer> charCountsList = Arrays.asList(charCounts);
+        int maxFrequency = Collections.max(charCountsList);
+        List<Character> mostPopularLetters = new ArrayList<>();
+        for (int character = 0; character < charCounts.length; character++) {
+            if (charCounts[character] == maxFrequency) {
+                mostPopularLetters.add((char)character);
+            }
+        }
+        return mostPopularLetters;
     }
 
     public static File[] getListOfFiles(String directory) {
@@ -45,11 +59,11 @@ public class DataUtils {
 
     public static int getOldestYear(String directory) {
         File[] directoryListing = getListOfFiles(directory);
-        int recentYear = 10000; // large number impossible to be a year
+        int oldestYear = 10000; // large number impossible to be a year
         for (File file : directoryListing) {
-            recentYear = Math.min(recentYear, getYearFromFileName(file));
+            oldestYear = Math.min(oldestYear, getYearFromFileName(file));
         }
-        return recentYear;
+        return oldestYear;
     }
     /*
     ranges of years that are empty, do not fit completely within the years in the given source of data, or are otherwise nonsensical
