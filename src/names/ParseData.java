@@ -1,6 +1,7 @@
 package names;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -11,23 +12,23 @@ public class ParseData {
     private final String directory;
     private final int startYear;
     private final int finalYear;
-    private final Map<Integer, List<String[]>> data;
+    private final Map<Integer, List<String[]>> allData;
 
     //TODO: NOTE THAT THE URL HAS TO BEGIN WITH HTTPS://
     public ParseData(String directory) {
         this.directory = directory;
-        this.data = new HashMap<>();
+        this.allData = new HashMap<>();
         if (directory.contains("https://")) {
             handleURL();
-            this.startYear = Collections.min(data.keySet());
-            this.finalYear = Collections.max(data.keySet());
+            this.startYear = Collections.min(allData.keySet());
+            this.finalYear = Collections.max(allData.keySet());
         } else {
             this.startYear = DataUtils.getOldestYear(directory);
             this.finalYear = DataUtils.getRecentYear(directory);
         }
         for (int year = startYear; year <= finalYear; year++) {
             try {
-                data.put(year, parseFile(year));
+                allData.put(year, parseFile(year));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -37,7 +38,7 @@ public class ParseData {
     public Map<Integer, String> getRankTable(int year, String gender) {
         int rank = 1;
         Map<Integer, String> rankTable = new HashMap<>();
-        for (String[] nameArray : data.get(year)) {
+        for (String[] nameArray : allData.get(year)) {
             if (nameArray[GENDER_INDEX].equals(gender)) {
                 rankTable.put(rank, nameArray[NAME_INDEX]);
                 rank++;
@@ -49,25 +50,13 @@ public class ParseData {
     public Map<String, Integer> getRankTableInverse(int year, String gender) {
         int rank = 1;
         Map<String, Integer> rankTableInverse = new HashMap<>();
-        for (String[] nameArray : data.get(year)) {
+        for (String[] nameArray : allData.get(year)) {
             if (nameArray[GENDER_INDEX].equals(gender)) {
                 rankTableInverse.put(nameArray[NAME_INDEX], rank);
                 rank++;
             }
         }
         return rankTableInverse;
-    }
-
-    public List<String[]> getDataFromYear(int year) {
-        return data.get(year);
-    }
-
-    public int getStartYear() {
-        return startYear;
-    }
-
-    public int getFinalYear() {
-        return finalYear;
     }
 
     private void handleURL() {
@@ -81,7 +70,7 @@ public class ParseData {
                     })
                     .forEach(fileName -> {
                         int year = DataUtils.getYearFromFileName(new File(fileName));
-                        data.put(year, null);
+                        allData.put(year, null);
                     });
             in.close();
         } catch (Exception e) {
@@ -91,15 +80,17 @@ public class ParseData {
 
     private List<String[]> parseFile(int year) throws IOException {
         String filePath = directory + "yob" + year + ".txt";
-        URL url = new URL(filePath);
-        if (!directory.contains("https://")) {
-            url = new File(filePath).toURI().toURL();
+        Scanner scan;
+        try {
+            URL url = new URL(filePath);
+            scan = new Scanner(url.openStream());
+        } catch (MalformedURLException e) {
+            scan = new Scanner(new File(filePath));
         }
         List<String[]> dataForYear = new ArrayList<>();
         try {
-            Scanner scan = new Scanner(url.openStream());
             if (!scan.hasNextLine()) {
-                throw new IllegalArgumentException(filePath + " has no data. Please remove.");
+                throw new IOException(filePath + " has no data. Please remove.");
             }
             while (scan.hasNextLine()) {
                 dataForYear.add(scan.nextLine().split(","));
@@ -108,5 +99,17 @@ public class ParseData {
             System.out.println(filePath + " not found");
         }
         return dataForYear;
+    }
+
+    public List<String[]> getDataFromYear(int year) {
+        return allData.get(year);
+    }
+
+    public int getStartYear() {
+        return startYear;
+    }
+
+    public int getFinalYear() {
+        return finalYear;
     }
 }
