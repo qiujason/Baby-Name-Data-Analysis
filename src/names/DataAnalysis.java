@@ -2,6 +2,7 @@ package names;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DataAnalysis {
     private static final String MALE = "M";
@@ -45,15 +46,9 @@ public class DataAnalysis {
 
     public String findSameRankInRecentYear(String name, String gender, int year) {
         DataUtils.handleYearErrors(data, year);
-        Map<Integer, String> rankTable = data.getRankTable(year, gender);
-        int nameRank = -1;
-        for (int rank : rankTable.keySet()) {
-            if (rankTable.get(rank).equals(name)) {
-                nameRank = rank;
-                break;
-            }
-        }
-        if (nameRank == -1) {
+        Map<String, Integer> rankTableInverse = data.getRankTableInverse(year, gender);
+        Integer nameRank = rankTableInverse.get(name);
+        if (nameRank == null) {
             return "Name not found";
         }
         int recentYear = data.getFinalYear();
@@ -81,6 +76,7 @@ public class DataAnalysis {
                 .collect(Collectors.toList());
     }
 
+    //TODO: handle ties
     public String[] findMostPopularLetterGirls(int startYear, int finalYear) {
         DataUtils.handleYearErrors(data, startYear, finalYear);
         Integer[] charCounts = new Integer[100];
@@ -89,17 +85,22 @@ public class DataAnalysis {
         for (int year = startYear; year <= finalYear; year++) {
             DataUtils.fillCountsAndNamesOfFirstLetters(data.getDataFromYear(year), charCounts, listNamesOfChar, FEMALE);
         }
-
-        List<Integer> charCountsList = Arrays.asList(charCounts);
-        char mostPopularLetter = (char)charCountsList.indexOf(Collections.max(charCountsList));
-
-        SortedSet<String> listOfNames = listNamesOfChar.get(mostPopularLetter);
-        String[] results = new String[listOfNames.size() + 1];
-        results[0] = Character.toString(mostPopularLetter);
-        int i = 1;
-        for (String name : listOfNames) {
-            results[i] = name;
-            i++;
+        List<Character> mostPopularLetters = DataUtils.getMostFrequentNamesWithFirstLetter(charCounts);
+        if (mostPopularLetters.size() <= 1) { // if only one name is most frequent
+            char mostPopularLetter = mostPopularLetters.get(0);
+            SortedSet<String> listOfNames = listNamesOfChar.get(mostPopularLetter);
+            String[] results = new String[listOfNames.size() + 1];
+            results[0] = Character.toString(mostPopularLetter);
+            int i = 1;
+            for (String name : listOfNames) {
+                results[i] = name;
+                i++;
+            }
+            return results;
+        }
+        String[] results = new String[mostPopularLetters.size()]; // if tied
+        for (int i = 0; i < mostPopularLetters.size(); i++) {
+            results[i] = Character.toString(mostPopularLetters.get(i));
         }
         return results;
     }
@@ -109,10 +110,11 @@ public class DataAnalysis {
         Map<Integer, Integer> rankings = new HashMap<>();
         for (int year = startYear; year <= finalYear; year++) {
             Map<String, Integer> rankTableInverse = data.getRankTableInverse(year, gender);
-            try {
+            Integer ranking = rankTableInverse.get(name);
+            if (ranking != null) {
                 rankings.put(year, rankTableInverse.get(name));
-            } catch (NullPointerException e) {
-                rankings.put(year, null);
+            } else {
+                rankings.put(year, 0);
             }
         }
         return rankings;
