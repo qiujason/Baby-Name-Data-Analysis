@@ -14,7 +14,6 @@ public class ParseData {
     private final int finalYear;
     private final Map<Integer, List<String[]>> allData;
 
-    //TODO: NOTE THAT THE URL HAS TO BEGIN WITH HTTPS://
     public ParseData(String directory) {
         this.directory = directory;
         this.allData = new HashMap<>();
