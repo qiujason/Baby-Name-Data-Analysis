@@ -13,6 +13,10 @@ public class DataAnalysis {
 
     private final ParseData data;
 
+    /**
+     * Creates a DataAnalysis object which creates a ParseData object by passing in directory parameter
+     * @param directory contains the directory path of all text files within a dataset
+     */
     public DataAnalysis(String directory) {
         data = new ParseData(directory);
     }
