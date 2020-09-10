@@ -14,6 +14,11 @@ public class ParseData {
     private final int finalYear;
     private final Map<Integer, List<String[]>> allData;
 
+    /**
+     * Creates a ParseData object which parses all the text files within the directory
+     * @param directory contains the directory path of all text files within a dataset
+     *                  can be a URL or a local path
+     */
     public ParseData(String directory) {
         this.directory = directory;
         this.allData = new HashMap<>();
@@ -34,6 +39,12 @@ public class ParseData {
         }
     }
 
+    /**
+     * Returns a map table that labels each rank with its corresponding name
+     * @param year      an int describing a valid year with a corresponding text file in the dataset
+     * @param gender    a String containing either "M" or "F"
+     * @return          a HashMap with rank as the key and name as the value
+     */
     public Map<Integer, String> getRankTable(int year, String gender) {
         int rank = 1;
         Map<Integer, String> rankTable = new HashMap<>();
@@ -46,6 +57,12 @@ public class ParseData {
         return rankTable;
     }
 
+    /**
+     * Returns an inverse map table that labels each name with its corresponding rank
+     * @param year      an int describing a valid year with a corresponding text file in the dataset
+     * @param gender    a String containing either "M" or "F"
+     * @return          a HashMap with name as the key and rank as the value
+     */
     public Map<String, Integer> getRankTableInverse(int year, String gender) {
         int rank = 1;
         Map<String, Integer> rankTableInverse = new HashMap<>();
@@ -58,6 +75,10 @@ public class ParseData {
         return rankTableInverse;
     }
 
+    /**
+     * helper method that parses through the HTML of a URL and grabs the names of text files. The year is pulled from
+     * the text file names and is then used to initialize allData
+     */
     private void handleURL() {
         try {
             URL dataURL = new URL(directory);
@@ -77,37 +98,58 @@ public class ParseData {
         }
     }
 
+    /**
+     * Parses and returns all name data within the text file of the given year in the dataset
+     * @param year          an int describing a valid year with a corresponding text file in the dataset
+     * @return              an ArrayList of String arrays that contain each name data in the format:
+     *                      index 0 contains name, index 1 contains gender, index 2 contains frequency
+     * @throws IOException  if file is empty
+     */
     private List<String[]> parseFile(int year) throws IOException {
         String filePath = directory + "yob" + year + ".txt";
         Scanner scan;
-        try {
+        try { // if filePath is a URL
             URL url = new URL(filePath);
             scan = new Scanner(url.openStream());
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException e) { // if filePath is a local path
             scan = new Scanner(new File(filePath));
         }
         List<String[]> dataForYear = new ArrayList<>();
         try {
-            if (!scan.hasNextLine()) {
+            if (!scan.hasNextLine()) { // file has no text to begin with
                 throw new IOException(filePath + " has no data. Please remove.");
             }
             while (scan.hasNextLine()) {
                 dataForYear.add(scan.nextLine().split(","));
             }
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) { // filePath is invalid
             System.out.println(filePath + " not found");
         }
         return dataForYear;
     }
 
+    /**
+     * Returns all name data of a specific year that is stored within allData data structure
+     * @param year  an int describing a valid year with a corresponding text file in the dataset
+     * @return      an ArrayList of String arrays of a given year that contain each name data in the format:
+     *              index 0 contains name, index 1 contains gender, index 2 contains frequency
+     */
     public List<String[]> getDataFromYear(int year) {
         return allData.get(year);
     }
 
+    /**
+     * getter function for startYear
+     * @return startYear
+     */
     public int getStartYear() {
         return startYear;
     }
 
+    /**
+     * getter function for finalYear
+     * @return finalYear
+     */
     public int getFinalYear() {
         return finalYear;
     }
