@@ -1,0 +1,5 @@
+Clara,F,100000
+Isabella,F,90000
+Elizabeth,F,80000
+John,M,100000
+Noah,M,90000

@@ -1,0 +1,10 @@
+Emma,F,100000
+Olivia,F,100000
+Ava,F,80000
+Isabella,F,70000
+Sara,F,60000
+John,M,100000
+William,M,80000
+James,M,70000
+Noah,M,60000
+Oliver,M,50000
